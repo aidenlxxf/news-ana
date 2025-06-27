@@ -1,0 +1,11 @@
+.turbo
+node_modules
+
+.DS_Store
+
+.env*
+
+.claude
+.cursor
+CLAUDE.md
+.augment-guidelines
