@@ -1,10 +1,10 @@
 import { Processor, WorkerHost, InjectQueue } from "@nestjs/bullmq";
 import { Logger } from "@nestjs/common";
 import { Job, Queue } from "bullmq";
-import { PrismaService } from "../prisma.service";
-import { ExecutionStatus, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { generateJobId, generateSchedulerId } from "../utils/bullmq-id.util";
 import { type NewsFetchQueue } from "./news-fetch.worker";
+import { TaskExecutionService } from "../task-execution/task-execution.service";
 
 export interface TaskSchedulerJobData {
   taskId: string;
@@ -26,7 +26,7 @@ export class TaskSchedulerWorker extends WorkerHost {
   private readonly logger = new Logger(TaskSchedulerWorker.name);
 
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly taskExecutionService: TaskExecutionService,
     @InjectQueue("task-scheduler")
     private readonly taskSchedulerQueue: TaskSchedulerQueue,
     @InjectQueue("news-fetch")
@@ -41,23 +41,13 @@ export class TaskSchedulerWorker extends WorkerHost {
     this.logger.log(`Processing task scheduler job for task: ${taskId}`);
 
     try {
-      const execution = await this.prisma.$transaction(async (tx) => {
-        const execution = await tx.taskExecution.create({
-          data: {
-            status: ExecutionStatus.PENDING,
-            startedAt: new Date(),
-            task: { connect: { id: taskId } },
-          },
-          select: {
-            id: true,
-          },
-        });
-        // Trigger news fetch job
-        await this.triggerNewsFetch(taskId, execution.id);
-        this.logger.log(`Task scheduler completed for task: ${taskId}`);
-        return { executionId: execution.id };
-      });
-      return execution;
+      const execution = await this.taskExecutionService.createExecution(taskId);
+
+      // Trigger news fetch job
+      await this.triggerNewsFetch(taskId, execution.id);
+      this.logger.log(`Task scheduler completed for task: ${taskId}`);
+
+      return { executionId: execution.id };
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2025") {

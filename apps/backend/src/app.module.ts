@@ -13,12 +13,18 @@ import { AllExceptionsFilter } from "./filters/http-exception.filter";
 import { NewsAnalysisController } from "./news-analysis/news-analysis.controller";
 import { NewsFetchService } from "./news-analysis/news-fetch.service";
 import { NewsAnalysisService } from "./news-analysis/news-analysis.service";
+import { AuthModule } from "./auth/auth.module";
+import { TaskExecutionModule } from "./task-execution/task-execution.module";
+import { WebPushModule } from "./webpush/webpush.module";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: [".env.local", ".env"],
     }),
+    AuthModule,
+    TaskExecutionModule,
+    WebPushModule,
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

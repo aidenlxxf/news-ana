@@ -49,7 +49,7 @@ export class NewsAnalysisTaskService {
   }: Pick<
     TaskParametersV1,
     "country" | "category" | "query"
-  >): Promise<CreateTaskResponseDto> {
+  >, userId: string): Promise<CreateTaskResponseDto> {
     const parameters = v.parse(TaskParametersV1Schema, {
       country,
       category,
@@ -61,6 +61,7 @@ export class NewsAnalysisTaskService {
       try {
         const task = await tx.task.create({
           data: {
+            userId,
             parameters,
             paramsHash: generateParamsHash(country, category, query),
           },
@@ -85,9 +86,9 @@ export class NewsAnalysisTaskService {
     };
   }
 
-  async getTask(taskId: string): Promise<GetTaskResponseDto> {
-    const task = await this.prisma.task.findUnique({
-      where: { id: taskId },
+  async getTask(taskId: string, userId: string): Promise<GetTaskResponseDto> {
+    const task = await this.prisma.task.findFirst({
+      where: { id: taskId, userId },
       include: {
         executions: {
           select: {
@@ -124,7 +125,15 @@ export class NewsAnalysisTaskService {
     };
   }
 
-  async cancelTask(taskId: string): Promise<{ message: string }> {
+  async cancelTask(taskId: string, userId: string): Promise<{ message: string }> {
+    const task = await this.prisma.task.findFirst({
+      where: { id: taskId, userId },
+    });
+
+    if (!task) {
+      throw new NotFoundException("Task not found");
+    }
+
     await this.prisma.task.delete({
       where: { id: taskId },
     });
@@ -142,8 +151,18 @@ export class NewsAnalysisTaskService {
       limit?: number;
       offset?: number;
     },
+    userId: string,
   ): Promise<ListTaskExecutionsResponseDto> {
     const { limit = 10, offset = 0 } = query;
+
+    // First verify the task belongs to the user
+    const task = await this.prisma.task.findFirst({
+      where: { id: taskId, userId },
+    });
+
+    if (!task) {
+      throw new NotFoundException("Task not found");
+    }
 
     const executions = await this.prisma.taskExecution.findMany({
       where: { taskId },
@@ -177,10 +196,11 @@ export class NewsAnalysisTaskService {
   async listTasks(query: {
     limit?: number;
     offset?: number;
-  }): Promise<ListTasksResponseDto> {
+  }, userId: string): Promise<ListTasksResponseDto> {
     const { limit = 10, offset = 0 } = query;
 
     const tasks = await this.prisma.task.findMany({
+      where: { userId },
       select: {
         id: true,
         parameters: true,
@@ -214,9 +234,9 @@ export class NewsAnalysisTaskService {
     };
   }
 
-  async refreshTask(taskId: string): Promise<RefreshTaskResponseDto> {
-    const task = await this.prisma.task.findUnique({
-      where: { id: taskId },
+  async refreshTask(taskId: string, userId: string): Promise<RefreshTaskResponseDto> {
+    const task = await this.prisma.task.findFirst({
+      where: { id: taskId, userId },
     });
 
     if (!task) {

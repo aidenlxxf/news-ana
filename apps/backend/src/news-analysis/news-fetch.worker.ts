@@ -11,6 +11,7 @@ import { NewsFetchService } from "./news-fetch.service";
 import { ExecutionStatus } from "@prisma/client";
 import { generateJobId } from "../utils/bullmq-id.util";
 import { type NewsAnalysisQueue } from "./news-analysis.worker";
+import { TaskExecutionService } from "../task-execution/task-execution.service";
 
 export interface NewsFetchJobData {
   taskId: string;
@@ -31,19 +32,20 @@ export class NewsFetchWorker extends WorkerHost {
   async onFailed(job: Job) {
     if (!job.finishedOn) return;
     this.logger.error(`news-fetch Job ${job.id} failed`, job.failedReason);
-    await this.prisma.taskExecution.update({
-      where: { id: job.data.executionId },
-      data: {
-        status: ExecutionStatus.FAILED,
+    await this.taskExecutionService.updateExecutionStatus(
+      job.data.executionId,
+      ExecutionStatus.FAILED,
+      {
         completedAt: new Date(),
         errorMessage: job.failedReason,
-      },
-    });
+      }
+    );
   }
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly newsFetchService: NewsFetchService,
+    private readonly taskExecutionService: TaskExecutionService,
     @InjectQueue("news-analysis") private readonly newsAnalysisQueue: NewsAnalysisQueue,
   ) {
     super();
@@ -70,12 +72,10 @@ export class NewsFetchWorker extends WorkerHost {
       const parameters = execution.task.parameters;
 
       // Update status to FETCHING
-      await this.prisma.taskExecution.update({
-        where: { id: executionId },
-        data: {
-          status: ExecutionStatus.FETCHING,
-        },
-      });
+      await this.taskExecutionService.updateExecutionStatus(
+        executionId,
+        ExecutionStatus.FETCHING
+      );
 
       this.logger.log("Starting news fetch:", {
         country: parameters.country,
@@ -86,14 +86,14 @@ export class NewsFetchWorker extends WorkerHost {
       const fetchedResult = await this.newsFetchService.fetchNews(parameters);
 
       if (fetchedResult.articles.length > 0) {
-        await this.prisma.taskExecution.update({
-          where: { id: executionId },
-          data: {
-            status: ExecutionStatus.ANALYZING,
+        await this.taskExecutionService.updateExecutionStatus(
+          executionId,
+          ExecutionStatus.ANALYZING,
+          {
             completedAt: new Date(),
             result: fetchedResult,
-          },
-        });
+          }
+        );
 
         this.logger.log(`News fetch completed for task: ${taskId}`);
 
@@ -101,14 +101,14 @@ export class NewsFetchWorker extends WorkerHost {
         await this.triggerAnalysisJob(taskId, executionId);
       } else {
         this.logger.log(`No articles found for task: ${taskId}`);
-        await this.prisma.taskExecution.update({
-          where: { id: executionId },
-          data: {
-            status: ExecutionStatus.COMPLETED,
+        await this.taskExecutionService.updateExecutionStatus(
+          executionId,
+          ExecutionStatus.COMPLETED,
+          {
             completedAt: new Date(),
             result: fetchedResult,
-          },
-        });
+          }
+        );
       }
     } catch (error) {
       this.logger.error(`News fetch failed for task: ${taskId}`, error);

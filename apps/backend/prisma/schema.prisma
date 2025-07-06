@@ -14,15 +14,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id       String @id @default(uuid())
+  username String @unique
+  /// bcrypt hash
+  password String 
+  createdAt DateTime @default(now()) @map("created_at")
+
+  tasks Task[]
+  pushSubscriptions PushSubscription[]
+
+  @@map("users")
+}
+
+model PushSubscription {
+  id       String @id @default(uuid())
+  userId   String @map("user_id")
+  endpoint String
+  p256dh   String
+  auth     String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, endpoint])
+  @@map("push_subscriptions")
+}
+
 model Task {
   id          String   @id @default(uuid())
+  userId      String   @map("user_id")
   /// [TaskParameters]
   parameters  Json     // Dynamic parameters (country, category, query, etc.)
   paramsHash  String   @unique @map("params_hash")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  executions  TaskExecution[]
+  user       User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  executions TaskExecution[]
 
   @@map("tasks")
 }

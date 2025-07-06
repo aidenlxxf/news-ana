@@ -4,6 +4,7 @@ import { Job, Queue } from "bullmq";
 import { PrismaService } from "../prisma.service";
 import { NewsAnalysisService } from "./news-analysis.service";
 import { ExecutionStatus } from "@prisma/client";
+import { TaskExecutionService } from "../task-execution/task-execution.service";
 
 import { isFetchedResult } from "../schema/news-analysis.schema";
 
@@ -26,19 +27,20 @@ export class NewsAnalysisWorker extends WorkerHost {
   async onFailed(job: Job) {
     if (!job.finishedOn) return;
     this.logger.error(`news-analysis Job ${job.id} failed`, job.failedReason);
-    await this.prisma.taskExecution.update({
-      where: { id: job.data.executionId },
-      data: {
-        status: ExecutionStatus.FAILED,
+    await this.taskExecutionService.updateExecutionStatus(
+      job.data.executionId,
+      ExecutionStatus.FAILED,
+      {
         completedAt: new Date(),
         errorMessage: job.failedReason,
-      },
-    });
+      }
+    );
   }
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly newsAnalysisService: NewsAnalysisService,
+    private readonly taskExecutionService: TaskExecutionService,
   ) {
     super();
   }
@@ -87,14 +89,14 @@ export class NewsAnalysisWorker extends WorkerHost {
       );
 
       // Update the same execution record with analyzed result
-      await this.prisma.taskExecution.update({
-        where: { id: executionId },
-        data: {
-          status: ExecutionStatus.COMPLETED,
+      await this.taskExecutionService.updateExecutionStatus(
+        executionId,
+        ExecutionStatus.COMPLETED,
+        {
           completedAt: new Date(),
           result: analyzedResult,
-        },
-      });
+        }
+      );
 
       this.logger.log(`News analysis completed for task: ${taskId}`);
     } catch (error) {
