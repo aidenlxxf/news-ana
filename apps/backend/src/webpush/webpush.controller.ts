@@ -2,8 +2,8 @@ import { Controller, Post, Delete, Body, UseGuards } from "@nestjs/common";
 import { User as UserEntity } from "@prisma/client";
 import { WebPushService } from "./webpush.service";
 import { PushSubscriptionDto } from "./dto/push-subscription.dto";
-import { BasicAuthGuard } from "../auth/basic-auth.guard";
-import { User } from "../auth/user.decorator";
+import { BasicAuthGuard } from "@/auth/basic-auth.guard";
+import { User } from "@/auth/user.decorator";
 
 @Controller('webpush')
 @UseGuards(BasicAuthGuard)

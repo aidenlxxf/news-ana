@@ -1,5 +1,5 @@
 import { Injectable, Logger, Inject, forwardRef } from "@nestjs/common";
-import { PrismaService } from "../prisma.service";
+import { PrismaService } from "@/prisma.service";
 import {
   TaskExecution,
   ExecutionStatus,
@@ -8,9 +8,9 @@ import {
   PushSubscription,
   type Prisma,
 } from "@prisma/client";
-import { isAnalyzedResult } from "../news-analysis/schema/news-analysis.schema";
-import { PushNotificationDto } from "../webpush/dto/push-subscription.dto";
-import { WebPushService } from "../webpush/webpush.service";
+import { isAnalyzedResult } from "@/news-analysis/schema/news-analysis.schema";
+import { PushNotificationDto } from "@/webpush/dto/push-subscription.dto";
+import { WebPushService } from "@/webpush/webpush.service";
 
 @Injectable()
 export class TaskExecutionService {
