@@ -1,16 +1,20 @@
 import { OnWorkerEvent, Processor, WorkerHost } from "@nestjs/bullmq";
 import { Logger } from "@nestjs/common";
-import { Job } from "bullmq";
+import { Job, Queue } from "bullmq";
 import { PrismaService } from "../prisma.service";
 import { NewsAnalysisService } from "./news-analysis.service";
 import { ExecutionStatus } from "@prisma/client";
 
 import { isFetchedResult } from "../schema/news-analysis.schema";
 
-interface NewsAnalysisJobData {
+export interface NewsAnalysisJobData {
   taskId: string;
   executionId: string;
 }
+
+export type NewsAnalysisResult = undefined;
+
+export type NewsAnalysisQueue = Queue<NewsAnalysisJobData, NewsAnalysisResult>;
 
 @Processor("news-analysis", {
   concurrency: 5,
@@ -39,7 +43,7 @@ export class NewsAnalysisWorker extends WorkerHost {
     super();
   }
 
-  async process(job: Job<NewsAnalysisJobData>): Promise<void> {
+  async process(job: Job<NewsAnalysisJobData>): Promise<NewsAnalysisResult> {
     const { taskId, executionId } = job.data;
 
     this.logger.log(`Processing news analysis job for task: ${taskId}`);

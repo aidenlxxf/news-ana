@@ -10,11 +10,16 @@ import { PrismaService } from "../prisma.service";
 import { NewsFetchService } from "./news-fetch.service";
 import { ExecutionStatus } from "@prisma/client";
 import { generateJobId } from "../utils/bullmq-id.util";
+import { type NewsAnalysisQueue } from "./news-analysis.worker";
 
-interface NewsFetchJobData {
+export interface NewsFetchJobData {
   taskId: string;
   executionId: string;
 }
+
+export type NewsFetchResult = undefined;
+
+export type NewsFetchQueue = Queue<NewsFetchJobData, NewsFetchResult>;
 
 @Processor("news-fetch", {
   concurrency: 5,
@@ -39,12 +44,12 @@ export class NewsFetchWorker extends WorkerHost {
   constructor(
     private readonly prisma: PrismaService,
     private readonly newsFetchService: NewsFetchService,
-    @InjectQueue("news-analysis") private readonly newsAnalysisQueue: Queue,
+    @InjectQueue("news-analysis") private readonly newsAnalysisQueue: NewsAnalysisQueue,
   ) {
     super();
   }
 
-  async process(job: Job<NewsFetchJobData>): Promise<void> {
+  async process(job: Job<NewsFetchJobData>): Promise<NewsFetchResult> {
     const { taskId, executionId } = job.data;
 
     this.logger.log(

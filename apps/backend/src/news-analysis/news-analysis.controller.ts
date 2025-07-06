@@ -16,6 +16,7 @@ import { ValidationPipe } from "../validators/valibot.pipe";
 import { ListTasksQueryDto, type ListTasksResponseDto } from "../dto/list-task.dto";
 import { type GetTaskResponseDto } from "../dto/get-task.dto";
 import { ListTaskExecutionsQueryDto, type ListTaskExecutionsResponseDto } from "../dto/list-task-executions.dto";
+import { type RefreshTaskResponseDto } from "../dto/refresh-task.dto";
 
 @Controller("api/news-analysis")
 export class NewsAnalysisController {
@@ -53,5 +54,11 @@ export class NewsAnalysisController {
     @Query(ValidationPipe) query: ListTaskExecutionsQueryDto,
   ): Promise<ListTaskExecutionsResponseDto> {
     return this.newsAnalysisService.getTaskExecutions(id, query.data);
+  }
+
+  @Post("tasks/:id/refresh")
+  @HttpCode(HttpStatus.OK)
+  async refreshTask(@Param("id") id: string): Promise<RefreshTaskResponseDto> {
+    return this.newsAnalysisService.refreshTask(id);
   }
 }

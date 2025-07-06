@@ -1,18 +1,23 @@
-import {
-  Processor,
-  WorkerHost,
-  InjectQueue,
-  OnWorkerEvent,
-} from "@nestjs/bullmq";
+import { Processor, WorkerHost, InjectQueue } from "@nestjs/bullmq";
 import { Logger } from "@nestjs/common";
 import { Job, Queue } from "bullmq";
 import { PrismaService } from "../prisma.service";
 import { ExecutionStatus, Prisma } from "@prisma/client";
 import { generateJobId, generateSchedulerId } from "../utils/bullmq-id.util";
+import { type NewsFetchQueue } from "./news-fetch.worker";
 
-interface TaskSchedulerJobData {
+export interface TaskSchedulerJobData {
   taskId: string;
 }
+
+export interface TaskSchedulerResult {
+  executionId: string;
+}
+
+export type TaskSchedulerQueue = Queue<
+  TaskSchedulerJobData,
+  TaskSchedulerResult
+>;
 
 @Processor("task-scheduler", {
   concurrency: 5,
@@ -22,13 +27,15 @@ export class TaskSchedulerWorker extends WorkerHost {
 
   constructor(
     private readonly prisma: PrismaService,
-    @InjectQueue("task-scheduler") private readonly taskSchedulerQueue: Queue,
-    @InjectQueue("news-fetch") private readonly newsFetchQueue: Queue,
+    @InjectQueue("task-scheduler")
+    private readonly taskSchedulerQueue: TaskSchedulerQueue,
+    @InjectQueue("news-fetch")
+    private readonly newsFetchQueue: NewsFetchQueue,
   ) {
     super();
   }
 
-  async process(job: Job<TaskSchedulerJobData>): Promise<{ executionId: string; }> {
+  async process(job: Job<TaskSchedulerJobData>): Promise<TaskSchedulerResult> {
     const { taskId } = job.data;
 
     this.logger.log(`Processing task scheduler job for task: ${taskId}`);

@@ -13,18 +13,34 @@ import { CreateTaskResponseDto } from "../dto/create-task.dto";
 import { GetTaskResponseDto } from "../dto/get-task.dto";
 import { ListTaskExecutionsResponseDto } from "../dto/list-task-executions.dto";
 import { ListTasksResponseDto } from "../dto/list-task.dto";
+import { RefreshTaskResponseDto } from "../dto/refresh-task.dto";
 import {
   TaskParametersV1,
   TaskParametersV1Schema,
 } from "../schema/task-parameters.schema";
 import * as v from "valibot";
+import { type TaskSchedulerQueue } from "./task-scheduler.worker";
 
 @Injectable()
 export class NewsAnalysisTaskService {
   constructor(
     private readonly prisma: PrismaService,
-    @InjectQueue("task-scheduler") private readonly taskSchedulerQueue: Queue,
+    @InjectQueue("task-scheduler")
+    private readonly taskSchedulerQueue: TaskSchedulerQueue,
   ) {}
+
+  private async scheduleTask(taskId: string) {
+    return await this.taskSchedulerQueue.upsertJobScheduler(
+      generateSchedulerId(taskId),
+      {
+        every: 1000 * 60 * 60,
+      },
+      {
+        name: `task-scheduler:${taskId}`,
+        data: { taskId },
+      },
+    );
+  }
 
   async createTask({
     country,
@@ -49,16 +65,7 @@ export class NewsAnalysisTaskService {
             paramsHash: generateParamsHash(country, category, query),
           },
         });
-        await this.taskSchedulerQueue.upsertJobScheduler(
-          generateSchedulerId(task.id),
-          {
-            every: 1000 * 60 * 60,
-          },
-          {
-            name: `task-scheduler:${task.id}`,
-            data: { taskId: task.id },
-          },
-        );
+        await this.scheduleTask(task.id);
 
         return task;
       } catch (err) {
@@ -121,7 +128,9 @@ export class NewsAnalysisTaskService {
     await this.prisma.task.delete({
       where: { id: taskId },
     });
-    await this.taskSchedulerQueue.removeJobScheduler(generateSchedulerId(taskId));
+    await this.taskSchedulerQueue.removeJobScheduler(
+      generateSchedulerId(taskId),
+    );
     return {
       message: "Task cancelled successfully",
     };
@@ -202,6 +211,23 @@ export class NewsAnalysisTaskService {
       }),
       limit,
       offset,
+    };
+  }
+
+  async refreshTask(taskId: string): Promise<RefreshTaskResponseDto> {
+    const task = await this.prisma.task.findUnique({
+      where: { id: taskId },
+    });
+
+    if (!task) {
+      throw new NotFoundException("Task not found");
+    }
+
+    await this.scheduleTask(taskId);
+
+    return {
+      taskId,
+      message: "Task refresh triggered successfully",
     };
   }
 }
