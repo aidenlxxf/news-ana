@@ -6,14 +6,14 @@ import { valibotSchema } from "@ai-sdk/valibot";
 import {
   NewsAIAnalysisOutput,
   newsAIAnalysisOutputSchema,
-} from "../schema/news-ai-analysis.schema";
-import { TaskParametersV1 } from "../schema/task-parameters.schema";
+} from "./schema/news-ai-analysis.schema";
+import { TaskParametersV1 } from "./schema/task-parameters.schema";
 import {
   NewsAnalysisResultV1Fetched,
   NewsAnalysisResultV1Analyzed,
   NewsArticle,
   NewsAnalysisResultV1,
-} from "../schema/news-analysis.schema";
+} from "./schema/news-analysis.schema";
 
 const SYSTEM_PROMPT = `You are a professional news analyst. Your task is to analyze a collection of news articles and provide a structured analysis in JSON format.
 
@@ -24,7 +24,6 @@ Based on the provided articles, you must provide:
 4. Key entity extraction: Including PERSON, ORGANIZATION, LOCATION, PRODUCT, EVENT.
 
 Ensure your analysis is objective and based strictly on the content of the provided articles.`;
-
 
 const USER_PROMPT_TEMPLATE = (
   params: TaskParametersV1,
@@ -60,7 +59,9 @@ export class NewsAnalysisService {
     fetchedResult: NewsAnalysisResultV1Fetched,
     params: TaskParametersV1,
   ): Promise<NewsAnalysisResultV1> {
-    this.logger.log(`Starting AI analysis for ${fetchedResult.articles.length} articles.`);
+    this.logger.log(
+      `Starting AI analysis for ${fetchedResult.articles.length} articles.`,
+    );
 
     try {
       if (fetchedResult.articles.length === 0) {
@@ -72,7 +73,10 @@ export class NewsAnalysisService {
         return fetchedResult;
       }
 
-      const aiAnalysis = await this.performAIAnalysis(fetchedResult.articles, params);
+      const aiAnalysis = await this.performAIAnalysis(
+        fetchedResult.articles,
+        params,
+      );
       this.logger.log("AI analysis complete.");
 
       const result = this.createAnalyzedResult(fetchedResult, aiAnalysis);

@@ -10,7 +10,11 @@ const EntityTypeSchema = v.picklist([
 
 export type EntityType = v.InferOutput<typeof EntityTypeSchema>;
 
-export const SentimentTypeSchema = v.picklist(["positive", "negative", "neutral"]);
+export const SentimentTypeSchema = v.picklist([
+  "positive",
+  "negative",
+  "neutral",
+]);
 export type SentimentType = v.InferOutput<typeof SentimentTypeSchema>;
 
 export const NewsEntitySchema = v.object({
@@ -32,6 +36,6 @@ export const newsAIAnalysisOutputSchema = v.object({
   sentiment: SentimentTypeSchema,
   entities: v.array(NewsEntitySchema),
 });
-export type NewsAIAnalysisOutput = v.InferOutput<typeof newsAIAnalysisOutputSchema>;
-
-
+export type NewsAIAnalysisOutput = v.InferOutput<
+  typeof newsAIAnalysisOutputSchema
+>;

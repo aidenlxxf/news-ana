@@ -1,12 +1,12 @@
 import { OnWorkerEvent, Processor, WorkerHost } from "@nestjs/bullmq";
 import { Logger } from "@nestjs/common";
 import { Job, Queue } from "bullmq";
-import { PrismaService } from "../prisma.service";
+import { PrismaService } from "@/prisma.service";
 import { NewsAnalysisService } from "./news-analysis.service";
 import { ExecutionStatus } from "@prisma/client";
-import { TaskExecutionService } from "../task-execution/task-execution.service";
+import { TaskExecutionService } from "@/task-execution/task-execution.service";
 
-import { isFetchedResult } from "../schema/news-analysis.schema";
+import { isFetchedResult } from "./schema/news-analysis.schema";
 
 export interface NewsAnalysisJobData {
   taskId: string;

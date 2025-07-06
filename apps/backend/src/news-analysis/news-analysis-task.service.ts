@@ -4,20 +4,19 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectQueue } from "@nestjs/bullmq";
-import { Queue } from "bullmq";
-import { PrismaService } from "../prisma.service";
-import { generateParamsHash } from "../utils/hash.util";
-import { generateSchedulerId } from "../utils/bullmq-id.util";
+import { PrismaService } from "@/prisma.service";
+import { generateParamsHash } from "@/utils/hash.util";
+import { generateSchedulerId } from "@/utils/bullmq-id.util";
 import { Prisma } from "@prisma/client";
-import { CreateTaskResponseDto } from "../dto/create-task.dto";
-import { GetTaskResponseDto } from "../dto/get-task.dto";
-import { ListTaskExecutionsResponseDto } from "../dto/list-task-executions.dto";
-import { ListTasksResponseDto } from "../dto/list-task.dto";
-import { RefreshTaskResponseDto } from "../dto/refresh-task.dto";
+import { CreateTaskResponseDto } from "./dto/create-task.dto";
+import { GetTaskResponseDto } from "./dto/get-task.dto";
+import { ListTaskExecutionsResponseDto } from "./dto/list-task-executions.dto";
+import { ListTasksResponseDto } from "./dto/list-task.dto";
+import { RefreshTaskResponseDto } from "./dto/refresh-task.dto";
 import {
   TaskParametersV1,
   TaskParametersV1Schema,
-} from "../schema/task-parameters.schema";
+} from "./schema/task-parameters.schema";
 import * as v from "valibot";
 import { type TaskSchedulerQueue } from "./task-scheduler.worker";
 

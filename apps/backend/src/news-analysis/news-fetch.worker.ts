@@ -6,12 +6,12 @@ import {
 } from "@nestjs/bullmq";
 import { Logger } from "@nestjs/common";
 import { Job, Queue } from "bullmq";
-import { PrismaService } from "../prisma.service";
+import { PrismaService } from "@/prisma.service";
 import { NewsFetchService } from "./news-fetch.service";
 import { ExecutionStatus } from "@prisma/client";
-import { generateJobId } from "../utils/bullmq-id.util";
+import { generateJobId } from "@/utils/bullmq-id.util";
 import { type NewsAnalysisQueue } from "./news-analysis.worker";
-import { TaskExecutionService } from "../task-execution/task-execution.service";
+import { TaskExecutionService } from "@/task-execution/task-execution.service";
 
 export interface NewsFetchJobData {
   taskId: string;

@@ -1,5 +1,5 @@
-import { NewsApiCategorySchema, NewsApiCountrySchema } from "../schema/task-parameters.schema";
-import { ValibotDto } from "../validators/valibot.dto";
+import { NewsApiCategorySchema, NewsApiCountrySchema } from "@/news-analysis/schema/task-parameters.schema";
+import { ValibotDto } from "../../validators/valibot.dto";
 import * as v from "valibot";
 
 const CreateTaskSchema = v.pipe(

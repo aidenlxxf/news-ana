@@ -1,5 +1,5 @@
 import { ExecutionStatus } from "@prisma/client";
-import { ValibotDto } from "../validators/valibot.dto";
+import { ValibotDto } from "@/validators/valibot.dto";
 import * as v from "valibot";
 
 export class ListTaskExecutionsQueryDto extends ValibotDto(

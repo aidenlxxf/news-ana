@@ -1,7 +1,6 @@
 import * as v from "valibot";
 import {
   BriefSummarySchema,
-  NewsAIAnalysisOutput,
   NewsEntitySchema,
   SentimentTypeSchema,
 } from "./news-ai-analysis.schema";
