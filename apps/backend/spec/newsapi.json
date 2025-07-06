@@ -1,0 +1,626 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "News API",
+    "description": "Search through millions of articles from over 150,000 large and small news sources and blogs. Get breaking news headlines, and search for articles from news sources and blogs all over the web.",
+    "version": "2.0.0",
+    "contact": {
+      "url": "https://newsapi.org/contact"
+    },
+    "termsOfService": "https://newsapi.org/terms"
+  },
+  "servers": [
+    {
+      "url": "https://newsapi.org/v2",
+      "description": "News API v2"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    },
+    {
+      "ApiKeyHeader": []
+    },
+    {
+      "ApiKeyQuery": []
+    }
+  ],
+  "paths": {
+    "/everything": {
+      "get": {
+        "summary": "Search everything",
+        "description": "Search through millions of articles from over 150,000 large and small news sources and blogs. This endpoint suits article discovery and analysis.",
+        "operationId": "getEverything",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Keywords or phrases to search for in the article title and body. Advanced search is supported. Max length: 500 chars.",
+            "schema": {
+              "type": "string",
+              "maxLength": 500
+            }
+          },
+          {
+            "name": "searchIn",
+            "in": "query",
+            "description": "The fields to restrict your q search to. Multiple options can be specified by separating them with a comma.",
+            "schema": {
+              "type": "string",
+              "enum": ["title", "description", "content", "title,description", "title,content", "description,content", "title,description,content"]
+            }
+          },
+          {
+            "name": "sources",
+            "in": "query",
+            "description": "A comma-separated string of identifiers (maximum 20) for the news sources or blogs you want headlines from.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "domains",
+            "in": "query",
+            "description": "A comma-separated string of domains (eg bbc.co.uk, techcrunch.com, engadget.com) to restrict the search to.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "excludeDomains",
+            "in": "query",
+            "description": "A comma-separated string of domains to remove from the results.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "A date and optional time for the oldest article allowed. This should be in ISO 8601 format (e.g. 2025-05-12 or 2025-05-12T06:47:40).",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "A date and optional time for the newest article allowed. This should be in ISO 8601 format (e.g. 2025-05-12 or 2025-05-12T06:47:40).",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "description": "The 2-letter ISO-639-1 code of the language you want to get headlines for.",
+            "schema": {
+              "type": "string",
+              "enum": ["ar", "de", "en", "es", "fr", "he", "it", "nl", "no", "pt", "ru", "sv", "ud", "zh"]
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "The order to sort the articles in.",
+            "schema": {
+              "type": "string",
+              "enum": ["relevancy", "popularity", "publishedAt"],
+              "default": "publishedAt"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "The number of results to return per page.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Use this to page through the results.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "apiKey",
+            "in": "query",
+            "description": "Your API key. Alternatively you can provide this via the X-Api-Key HTTP header.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EverythingResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/top-headlines": {
+      "get": {
+        "summary": "Get top headlines",
+        "description": "This endpoint provides live top and breaking headlines for a country, specific category in a country, single source, or multiple sources. You can also search with keywords. Articles are sorted by the earliest date published first.",
+        "operationId": "getTopHeadlines",
+        "parameters": [
+          {
+            "name": "country",
+            "in": "query",
+            "description": "The 2-letter ISO 3166-1 code of the country you want to get headlines for. Note: you can't mix this param with the sources param.",
+            "schema": {
+              "type": "string",
+              "enum": ["ae", "ar", "at", "au", "be", "bg", "br", "ca", "ch", "cn", "co", "cu", "cz", "de", "eg", "fr", "gb", "gr", "hk", "hu", "id", "ie", "il", "in", "it", "jp", "kr", "lt", "lv", "ma", "mx", "my", "ng", "nl", "no", "nz", "ph", "pl", "pt", "ro", "rs", "ru", "sa", "se", "sg", "si", "sk", "th", "tr", "tw", "ua", "us", "ve", "za"]
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "description": "The category you want to get headlines for. Note: you can't mix this param with the sources param.",
+            "schema": {
+              "type": "string",
+              "enum": ["business", "entertainment", "general", "health", "science", "sports", "technology"]
+            }
+          },
+          {
+            "name": "sources",
+            "in": "query",
+            "description": "A comma-separated string of identifiers for the news sources or blogs you want headlines from. Note: you can't mix this param with the country or category params.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Keywords or a phrase to search for.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "The number of results to return per page (request). 20 is the default, 100 is the maximum.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Use this to page through the results if the total results found is greater than the page size.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "apiKey",
+            "in": "query",
+            "description": "Your API key. Alternatively you can provide this via the X-Api-Key HTTP header.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopHeadlinesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/top-headlines/sources": {
+      "get": {
+        "summary": "Get sources",
+        "description": "This endpoint returns the subset of news publishers that top headlines are available from. It's mainly a convenience endpoint that you can use to keep track of the publishers available on the API.",
+        "operationId": "getSources",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Find sources that display news of this category.",
+            "schema": {
+              "type": "string",
+              "enum": ["business", "entertainment", "general", "health", "science", "sports", "technology"]
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "description": "Find sources that display news in a specific language.",
+            "schema": {
+              "type": "string",
+              "enum": ["ar", "de", "en", "es", "fr", "he", "it", "nl", "no", "pt", "ru", "sv", "ud", "zh"]
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "description": "Find sources that display news in a specific country.",
+            "schema": {
+              "type": "string",
+              "enum": ["ae", "ar", "at", "au", "be", "bg", "br", "ca", "ch", "cn", "co", "cu", "cz", "de", "eg", "fr", "gb", "gr", "hk", "hu", "id", "ie", "il", "in", "it", "jp", "kr", "lt", "lv", "ma", "mx", "my", "ng", "nl", "no", "nz", "ph", "pl", "pt", "ro", "rs", "ru", "sa", "se", "sg", "si", "sk", "th", "tr", "tw", "ua", "us", "ve", "za"]
+            }
+          },
+          {
+            "name": "apiKey",
+            "in": "query",
+            "description": "Your API key. Alternatively you can provide this via the X-Api-Key HTTP header.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourcesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "API key passed as Authorization header (Bearer token is optional)"
+      },
+      "ApiKeyHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Api-Key",
+        "description": "API key passed as X-Api-Key header"
+      },
+      "ApiKeyQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "API key passed as query parameter"
+      }
+    },
+    "schemas": {
+      "Article": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "nullable": true,
+                "description": "The identifier for the source"
+              },
+              "name": {
+                "type": "string",
+                "description": "The display name for the source"
+              }
+            }
+          },
+          "author": {
+            "type": "string",
+            "nullable": true,
+            "description": "The author of the article"
+          },
+          "title": {
+            "type": "string",
+            "description": "The headline or title of the article"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "A description or snippet from the article"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "The direct URL to the article"
+          },
+          "urlToImage": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true,
+            "description": "The URL to a relevant image for the article"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date and time that the article was published, in UTC (+000)"
+          },
+          "content": {
+            "type": "string",
+            "nullable": true,
+            "description": "The unformatted content of the article, where available. This is truncated to 200 chars."
+          }
+        },
+        "required": ["source", "title", "url", "publishedAt"]
+      },
+      "Source": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The identifier of the news source"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the news source"
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the news source"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "The URL of the homepage"
+          },
+          "category": {
+            "type": "string",
+            "description": "The type of news to expect from this news source"
+          },
+          "language": {
+            "type": "string",
+            "description": "The language that this news source writes in"
+          },
+          "country": {
+            "type": "string",
+            "description": "The country this news source is based in"
+          }
+        },
+        "required": ["id", "name", "description", "url", "category", "language", "country"]
+      },
+      "EverythingResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["ok"],
+            "description": "The status of the request"
+          },
+          "totalResults": {
+            "type": "integer",
+            "description": "The total number of results available for your request"
+          },
+          "articles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Article"
+            },
+            "description": "The results of the request"
+          }
+        },
+        "required": ["status", "totalResults", "articles"]
+      },
+      "TopHeadlinesResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["ok"],
+            "description": "The status of the request"
+          },
+          "totalResults": {
+            "type": "integer",
+            "description": "The total number of results available for your request"
+          },
+          "articles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Article"
+            },
+            "description": "The results of the request"
+          }
+        },
+        "required": ["status", "totalResults", "articles"]
+      },
+      "SourcesResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["ok"],
+            "description": "The status of the request"
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Source"
+            },
+            "description": "The results of the request"
+          }
+        },
+        "required": ["status", "sources"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["error"],
+            "description": "The status of the request"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "apiKeyDisabled",
+              "apiKeyExhausted", 
+              "apiKeyInvalid",
+              "apiKeyMissing",
+              "parameterInvalid",
+              "parametersMissing",
+              "rateLimited",
+              "sourcesTooMany",
+              "sourceDoesNotExist",
+              "unexpectedError"
+            ],
+            "description": "A short code identifying the type of error returned"
+          },
+          "message": {
+            "type": "string",
+            "description": "A fuller description of the error, usually including how to fix it"
+          }
+        },
+        "required": ["status", "code", "message"]
+      }
+    }
+  }
+}

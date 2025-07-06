@@ -5,9 +5,9 @@ import {
   HttpException,
   HttpStatus,
   Logger,
-} from '@nestjs/common';
-import { Request, Response } from 'express';
-import { Prisma } from '@prisma/client';
+} from "@nestjs/common";
+import { Request, Response } from "express";
+import { Prisma } from "@prisma/client";
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -19,25 +19,24 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = 'Internal server error';
+    let message = "Internal server error";
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       message = exception.message;
     } else if (exception instanceof Prisma.PrismaClientKnownRequestError) {
-      // 处理 Prisma 数据库错误
       switch (exception.code) {
-        case 'P2002':
+        case "P2002":
           status = HttpStatus.CONFLICT;
-          message = 'Resource already exists';
+          message = "Resource already exists";
           break;
-        case 'P2025':
+        case "P2025":
           status = HttpStatus.NOT_FOUND;
-          message = 'Resource not found';
+          message = "Resource not found";
           break;
         default:
           status = HttpStatus.BAD_REQUEST;
-          message = 'Database operation failed';
+          message = "Database operation failed";
       }
     } else if (exception instanceof Error) {
       message = exception.message;

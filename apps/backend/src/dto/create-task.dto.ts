@@ -1,18 +1,30 @@
-import { IsString, IsNotEmpty, Length } from 'class-validator';
+import { NewsApiCategorySchema, NewsApiCountrySchema } from "../schema/task-parameters.schema";
+import { ValibotDto } from "../validators/valibot.dto";
+import * as v from "valibot";
 
-export class CreateTaskDto {
-  @IsString()
-  @IsNotEmpty()
-  @Length(1, 100)
-  country: string;
+const CreateTaskSchema = v.pipe(
+  v.strictObject({
+    country: v.optional(NewsApiCountrySchema),
+    category: v.optional(NewsApiCategorySchema),
+    query: v.optional(v.string()),
+  }),
+  v.check(
+    (params) =>
+      !(
+        params.category === undefined &&
+        params.country === undefined &&
+        params.query === undefined
+      ),
+    "at least one of country, category, or query must be provided",
+  ),
+  v.brand("CreateTaskSchema"),
+);
 
-  @IsString()
-  @IsNotEmpty()
-  @Length(1, 100)
-  category: string;
+export type CreateTaskDtoType = v.InferOutput<typeof CreateTaskSchema>;
 
-  @IsString()
-  @IsNotEmpty()
-  @Length(1, 500)
-  query: string;
-}
+export class CreateTaskDto extends ValibotDto(CreateTaskSchema) {}
+
+export type CreateTaskResponseDto = {
+  taskId: string;
+  message: string;
+};
