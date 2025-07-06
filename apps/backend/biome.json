@@ -14,6 +14,9 @@
     "rules": {
       "style": {
         "useImportType": "off"
+      },
+      "correctness": {
+        "useHookAtTopLevel": "off"
       }
     }
   },
@@ -22,6 +25,11 @@
       "source": {
         "organizeImports": "off"
       }
+    }
+  },
+  "javascript": {
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
     }
   },
   "formatter": {

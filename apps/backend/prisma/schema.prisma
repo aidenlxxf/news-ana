@@ -9,3 +9,45 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Task {
+  id          String   @id @default(uuid())
+  country     String
+  category    String
+  query       String
+  paramsHash  String   @unique @map("params_hash")
+  status      TaskStatus @default(ACTIVE)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  executions  TaskExecution[]
+
+  @@map("tasks")
+}
+
+model TaskExecution {
+  id          String   @id @default(uuid())
+  taskId      String   @map("task_id")
+  status      ExecutionStatus @default(PENDING)
+  startedAt   DateTime? @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  result      Json?
+  errorMessage String? @map("error_message")
+
+  task        Task     @relation(fields: [taskId], references: [id])
+
+  @@map("task_executions")
+}
+
+enum TaskStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+}
+
+enum ExecutionStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}

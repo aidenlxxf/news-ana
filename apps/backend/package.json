@@ -17,7 +17,9 @@
     "test": "jest",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "db:push": "dotenv -e .env.local -e .env -- prisma db push",
+    "db:gen": "dotenv -e .env.local -e .env -- prisma generate"
   },
   "dependencies": {
     "@nestjs/bullmq": "^11.0.2",
@@ -27,6 +29,8 @@
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/client": "^6.11.1",
     "bullmq": "^5.56.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
@@ -40,6 +44,7 @@
     "@types/jest": "^29.5.14",
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
+    "dotenv-cli": "^8.0.0",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
