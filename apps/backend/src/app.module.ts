@@ -1,8 +1,6 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { APP_FILTER } from "@nestjs/core";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
 import { BullModule } from "@nestjs/bullmq";
 import { PrismaService } from "./prisma.service";
 import { AllExceptionsFilter } from "./filters/http-exception.filter";
@@ -30,9 +28,8 @@ import { NewsAnalysisModule } from "./news-analysis/news-analysis.module";
     WebPushModule,
     NewsAnalysisModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
-    AppService,
     PrismaService,
     {
       provide: APP_FILTER,
