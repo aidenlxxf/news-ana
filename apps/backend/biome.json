@@ -3,9 +3,31 @@
   "root": false,
   "extends": "//",
   "files": {
-    "includes": ["src/**/*.ts", "test/**/*.ts", "libs/**/*.ts", "test/**/*.ts"]
+    "includes": [
+      "src/**/*.ts",
+      "test/**/*.ts",
+      "libs/**/*.ts",
+      "test/**/*.ts"
+    ]
+  },
+  "linter": {
+    "rules": {
+      "style": {
+        "useImportType": "off"
+      }
+    }
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "off"
+      }
+    }
   },
   "formatter": {
-    "includes": ["src/**/*.ts", "test/**/*.ts"]
+    "includes": [
+      "src/**/*.ts",
+      "test/**/*.ts"
+    ]
   }
 }
