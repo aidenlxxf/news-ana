@@ -1,12 +1,17 @@
 import { ExecutionStatus } from "@prisma/client";
 import { ValibotDto } from "@/validators/valibot.dto";
+import { formInteger } from "@/validators/valibot.schema";
+
 import * as v from "valibot";
 
 export class ListTaskExecutionsQueryDto extends ValibotDto(
-  v.strictObject({
-    limit: v.optional(v.number(), 20),
-    offset: v.optional(v.number(), 0),
-  }),
+  v.pick(
+    v.object({
+      limit: v.pipe(formInteger(20), v.minValue(1)),
+      offset: v.pipe(formInteger(0), v.minValue(0)),
+    }),
+    ["limit", "offset"],
+  ),
 ) {}
 
 export interface ListTaskExecutionsResponseDto {

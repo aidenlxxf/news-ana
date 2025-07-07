@@ -1,13 +1,19 @@
-import { NewsApiCategorySchema, NewsApiCountrySchema } from "@/news-analysis/schema/task-parameters.schema";
-import { ValibotDto } from "../../validators/valibot.dto";
+import {
+  NewsApiCategorySchema,
+  NewsApiCountrySchema,
+} from "@/news-analysis/schema/task-parameters.schema";
+import { ValibotDto } from "@/validators/valibot.dto";
 import * as v from "valibot";
 
 const CreateTaskSchema = v.pipe(
-  v.strictObject({
-    country: v.optional(NewsApiCountrySchema),
-    category: v.optional(NewsApiCategorySchema),
-    query: v.optional(v.string()),
-  }),
+  v.pick(
+    v.object({
+      country: v.optional(NewsApiCountrySchema),
+      category: v.optional(NewsApiCategorySchema),
+      query: v.optional(v.string()),
+    }),
+    ["country", "category", "query"],
+  ),
   v.check(
     (params) =>
       !(
