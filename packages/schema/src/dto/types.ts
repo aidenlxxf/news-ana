@@ -63,6 +63,19 @@ export interface PushNotificationDto {
   type: "success" | "error";
 }
 
+// Get Latest Result Response
+export interface GetLatestResultResponseDto {
+  taskId: string;
+  execution?: {
+    id: string;
+    status: ExecutionStatus;
+    startedAt: string;
+    completedAt?: string;
+    result: any; // NewsAnalysisResult
+  };
+  hasResult: boolean;
+}
+
 // API Error Response
 export interface ApiErrorResponse {
   message: string;

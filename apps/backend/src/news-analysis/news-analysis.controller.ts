@@ -18,6 +18,7 @@ import {
   CreateTaskDto,
   type CreateTaskResponseDto,
 } from "./dto/create-task.dto";
+import { type GetLatestResultResponseDto } from "./dto/get-latest-result.dto";
 import { type GetTaskResponseDto } from "./dto/get-task.dto";
 import {
   ListTasksQueryDto,
@@ -85,5 +86,13 @@ export class NewsAnalysisController {
     @User() user: UserEntity,
   ): Promise<RefreshTaskResponseDto> {
     return this.newsAnalysisService.refreshTask(id, user.id);
+  }
+
+  @Get("tasks/:id/latest-result")
+  async getLatestResult(
+    @Param("id") id: string,
+    @User() user: UserEntity,
+  ): Promise<GetLatestResultResponseDto> {
+    return this.newsAnalysisService.getLatestResult(id, user.id);
   }
 }

@@ -11,6 +11,7 @@ import { PrismaService } from "@/prisma.service";
 import { generateSchedulerId } from "@/utils/bullmq-id.util";
 import { generateParamsHash } from "@/utils/hash.util";
 import { CreateTaskResponseDto } from "./dto/create-task.dto";
+import { GetLatestResultResponseDto } from "./dto/get-latest-result.dto";
 import { GetTaskResponseDto } from "./dto/get-task.dto";
 import { ListTasksResponseDto } from "./dto/list-task.dto";
 import { ListTaskExecutionsResponseDto } from "./dto/list-task-executions.dto";
@@ -253,6 +254,53 @@ export class NewsAnalysisTaskService {
     return {
       taskId,
       message: "Task refresh triggered successfully",
+    };
+  }
+
+  async getLatestResult(
+    taskId: string,
+    userId: string,
+  ): Promise<GetLatestResultResponseDto> {
+    // First verify the task belongs to the user
+    const task = await this.prisma.task.findFirst({
+      where: { id: taskId, userId },
+    });
+
+    if (!task) {
+      throw new NotFoundException("Task not found");
+    }
+
+    // Find the latest completed execution with result
+    const latestExecution = await this.prisma.taskExecution.findFirst({
+      where: {
+        taskId,
+        status: "COMPLETED",
+        result: {
+          not: Prisma.JsonNull,
+        },
+      },
+      orderBy: { completedAt: "desc" },
+      select: {
+        id: true,
+        status: true,
+        startedAt: true,
+        completedAt: true,
+        result: true,
+      },
+    });
+
+    return {
+      taskId,
+      execution: latestExecution
+        ? {
+            id: latestExecution.id,
+            status: latestExecution.status,
+            startedAt: latestExecution.startedAt?.toISOString() || "",
+            completedAt: latestExecution.completedAt?.toISOString(),
+            result: latestExecution.result,
+          }
+        : undefined,
+      hasResult: !!latestExecution,
     };
   }
 }
