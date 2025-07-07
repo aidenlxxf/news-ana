@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
 
 export function generateParamsHash(
-  country?: string,
-  category?: string,
-  query?: string,
+  country?: string | null,
+  category?: string | null,
+  query?: string | null,
 ): string {
   const normalized = JSON.stringify({
     country: country?.toLowerCase().trim() || null,

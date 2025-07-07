@@ -1,0 +1,31 @@
+{
+  "name": "@na/schema",
+  "version": "0.1.0",
+  "description": "Shared Valibot schemas and types for News Analysis system",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "format": "biome format --write",
+    "lint": "biome check --write"
+  },
+  "peerDependencies": {
+    "valibot": "^1.1.0"
+  },
+  "devDependencies": {
+    "typescript": "~5.8.2",
+    "valibot": "^1.1.0"
+  },
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ]
+}

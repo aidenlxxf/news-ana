@@ -6,7 +6,7 @@ import { NewsAnalysisService } from "./news-analysis.service";
 import { ExecutionStatus } from "@prisma/client";
 import { TaskExecutionService } from "@/task-execution/task-execution.service";
 import * as v from "valibot";
-import { isFetchedResult } from "./schema/news-analysis.schema";
+import { isFetchedResult } from "@na/schema";
 
 const NewsAnalysisJobDataSchema = v.strictObject({
   taskId: v.string(),

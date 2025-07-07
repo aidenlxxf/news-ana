@@ -3,11 +3,11 @@ import { ConfigService } from "@nestjs/config";
 import { getTopHeadlines, GetTopHeadlinesData } from "@/clients/newsapi";
 import { client as newsApiClient } from "@/clients/newsapi/client.gen";
 import { distinct } from "@std/collections/distinct";
-import { TaskParametersV1 } from "./schema/task-parameters.schema";
+import { TaskParametersV1 } from "@na/schema";
 import {
   NewsAnalysisResultV1Fetched,
   NewsArticle,
-} from "./schema/news-analysis.schema";
+} from "@na/schema";
 
 @Injectable()
 export class NewsFetchService {

@@ -9,3 +9,5 @@ node_modules
 .cursor
 CLAUDE.md
 .augment-guidelines
+
+dist

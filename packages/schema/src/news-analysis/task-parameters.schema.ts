@@ -72,9 +72,9 @@ export type NewsApiCategory = v.InferOutput<typeof NewsApiCategorySchema>;
 
 export const TaskParametersV1Schema = v.pipe(
   v.object({
-    country: v.optional(NewsApiCountrySchema),
-    category: v.optional(NewsApiCategorySchema),
-    query: v.optional(v.string()),
+    country: v.nullish(NewsApiCountrySchema),
+    category: v.nullish(NewsApiCategorySchema),
+    query: v.nullish(v.string()),
     version: v.literal("news-fetch:v1"),
   }),
   v.check(
@@ -86,6 +86,12 @@ export const TaskParametersV1Schema = v.pipe(
       ),
     "at least one of country, category, or query must be provided",
   ),
+  v.transform((params) => ({
+    ...params,
+    country: params.country ?? null,
+    category: params.category ?? null,
+    query: params.query ?? null,
+  })),
   v.brand("TaskParametersV1Schema"),
 );
 

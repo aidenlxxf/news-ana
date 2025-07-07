@@ -8,7 +8,7 @@ import {
   PushSubscription,
   type Prisma,
 } from "@prisma/client";
-import { isAnalyzedResult } from "@/news-analysis/schema/news-analysis.schema";
+import { isAnalyzedResult } from "@na/schema";
 import { PushNotificationDto } from "@/webpush/dto/push-subscription.dto";
 import { WebPushService } from "@/webpush/webpush.service";
 

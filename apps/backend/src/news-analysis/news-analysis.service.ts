@@ -6,14 +6,12 @@ import { valibotSchema } from "@ai-sdk/valibot";
 import {
   NewsAIAnalysisOutput,
   newsAIAnalysisOutputSchema,
-} from "./schema/news-ai-analysis.schema";
-import { TaskParametersV1 } from "./schema/task-parameters.schema";
-import {
+  TaskParametersV1,
   NewsAnalysisResultV1Fetched,
   NewsAnalysisResultV1Analyzed,
   NewsArticle,
   NewsAnalysisResultV1,
-} from "./schema/news-analysis.schema";
+} from "@na/schema";
 
 const SYSTEM_PROMPT = `You are a professional news analyst. Your task is to analyze a collection of news articles and provide a structured analysis in JSON format.
 

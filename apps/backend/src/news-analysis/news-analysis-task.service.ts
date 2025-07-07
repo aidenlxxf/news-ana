@@ -13,10 +13,7 @@ import { GetTaskResponseDto } from "./dto/get-task.dto";
 import { ListTaskExecutionsResponseDto } from "./dto/list-task-executions.dto";
 import { ListTasksResponseDto } from "./dto/list-task.dto";
 import { RefreshTaskResponseDto } from "./dto/refresh-task.dto";
-import {
-  TaskParametersV1,
-  TaskParametersV1Schema,
-} from "./schema/task-parameters.schema";
+import { TaskParametersV1, TaskParametersV1Schema } from "@na/schema";
 import * as v from "valibot";
 import { type TaskSchedulerQueue } from "./task-scheduler.worker";
 
@@ -41,14 +38,14 @@ export class NewsAnalysisTaskService {
     );
   }
 
-  async createTask({
-    country,
-    category,
-    query,
-  }: Pick<
-    TaskParametersV1,
-    "country" | "category" | "query"
-  >, userId: string): Promise<CreateTaskResponseDto> {
+  async createTask(
+    {
+      country,
+      category,
+      query,
+    }: Pick<TaskParametersV1, "country" | "category" | "query">,
+    userId: string,
+  ): Promise<CreateTaskResponseDto> {
     const parameters = v.parse(TaskParametersV1Schema, {
       country,
       category,
@@ -124,7 +121,10 @@ export class NewsAnalysisTaskService {
     };
   }
 
-  async cancelTask(taskId: string, userId: string): Promise<{ message: string }> {
+  async cancelTask(
+    taskId: string,
+    userId: string,
+  ): Promise<{ message: string }> {
     const task = await this.prisma.task.findFirst({
       where: { id: taskId, userId },
     });
@@ -192,10 +192,13 @@ export class NewsAnalysisTaskService {
     };
   }
 
-  async listTasks(query: {
-    limit?: number;
-    offset?: number;
-  }, userId: string): Promise<ListTasksResponseDto> {
+  async listTasks(
+    query: {
+      limit?: number;
+      offset?: number;
+    },
+    userId: string,
+  ): Promise<ListTasksResponseDto> {
     const { limit = 10, offset = 0 } = query;
 
     const tasks = await this.prisma.task.findMany({
@@ -221,9 +224,9 @@ export class NewsAnalysisTaskService {
       tasks: tasks.map(({ id, parameters: params, createdAt, executions }) => {
         return {
           id,
-          country: params.country,
-          category: params.category,
-          query: params.query,
+          country: params.country ?? undefined,
+          category: params.category ?? undefined,
+          query: params.query ?? undefined,
           createdAt: createdAt.toISOString(),
           lastExecutionStatus: executions[0]?.status,
         };
@@ -233,7 +236,10 @@ export class NewsAnalysisTaskService {
     };
   }
 
-  async refreshTask(taskId: string, userId: string): Promise<RefreshTaskResponseDto> {
+  async refreshTask(
+    taskId: string,
+    userId: string,
+  ): Promise<RefreshTaskResponseDto> {
     const task = await this.prisma.task.findFirst({
       where: { id: taskId, userId },
     });

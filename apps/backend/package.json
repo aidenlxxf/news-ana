@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "@na/backend",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -27,6 +27,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^1.3.22",
     "@ai-sdk/valibot": "^0.1.28",
+    "@na/schema": "workspace:*",
     "@nestjs/bullmq": "^11.0.2",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",

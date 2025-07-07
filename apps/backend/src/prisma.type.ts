@@ -1,5 +1,5 @@
-import type { TaskParameters as TaskParametersType } from "./news-analysis/schema/task-parameters.schema";
-import type { NewsAnalysisResult as NewsAnalysisResultType } from "./news-analysis/schema/news-analysis.schema";
+import type { TaskParameters as TaskParametersType } from "@na/schema";
+import type { NewsAnalysisResult as NewsAnalysisResultType } from "@na/schema";
 
 declare global {
   namespace PrismaJson {
