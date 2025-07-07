@@ -3,7 +3,7 @@ import {
   BriefSummarySchema,
   NewsEntitySchema,
   SentimentTypeSchema,
-} from "./news-ai-analysis.schema";
+} from "./news-ai-analysis.schema.js";
 
 export const NewsArticleSchema = v.object({
   source: v.object({

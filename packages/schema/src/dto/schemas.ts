@@ -1,6 +1,6 @@
 import * as v from "valibot";
-import { NewsApiCategorySchema, NewsApiCountrySchema } from "../news-analysis/task-parameters.schema";
-import { formInteger } from "../utils/form-helpers";
+import { NewsApiCategorySchema, NewsApiCountrySchema } from "../news-analysis/task-parameters.schema.js";
+import { formInteger } from "../utils/form-helpers.js";
 
 // Create Task Schema
 export const CreateTaskSchema = v.pipe(

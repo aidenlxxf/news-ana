@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Shared Valibot schemas and types for News Analysis system",
   "main": "dist/index.js",
+  "type": "module",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {

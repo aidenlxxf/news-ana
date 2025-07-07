@@ -1,13 +1,5 @@
 // Common execution status type (matches Prisma enum)
-type ExecutionStatusEnum = {
-  PENDING: "PENDING";
-  FETCHING: "FETCHING";
-  ANALYZING: "ANALYZING";
-  COMPLETED: "COMPLETED";
-  FAILED: "FAILED";
-};
-
-export type ExecutionStatus = ExecutionStatusEnum[keyof ExecutionStatusEnum];
+export type ExecutionStatus = "PENDING" | "FETCHING" | "ANALYZING" | "COMPLETED" | "FAILED";
 
 // Task-related DTO interfaces
 export interface GetTaskResponseDto {
