@@ -1,17 +1,21 @@
 import { OnWorkerEvent, Processor, WorkerHost } from "@nestjs/bullmq";
 import { Logger } from "@nestjs/common";
-import { Job, Queue } from "bullmq";
+import { Job, Queue, UnrecoverableError } from "bullmq";
 import { PrismaService } from "@/prisma.service";
 import { NewsAnalysisService } from "./news-analysis.service";
 import { ExecutionStatus } from "@prisma/client";
 import { TaskExecutionService } from "@/task-execution/task-execution.service";
-
+import * as v from "valibot";
 import { isFetchedResult } from "./schema/news-analysis.schema";
 
-export interface NewsAnalysisJobData {
-  taskId: string;
-  executionId: string;
-}
+const NewsAnalysisJobDataSchema = v.strictObject({
+  taskId: v.string(),
+  executionId: v.string(),
+});
+
+export type NewsAnalysisJobData = v.InferOutput<
+  typeof NewsAnalysisJobDataSchema
+>;
 
 export type NewsAnalysisResult = undefined;
 
@@ -33,7 +37,7 @@ export class NewsAnalysisWorker extends WorkerHost {
       {
         completedAt: new Date(),
         errorMessage: job.failedReason,
-      }
+      },
     );
   }
 
@@ -46,11 +50,13 @@ export class NewsAnalysisWorker extends WorkerHost {
   }
 
   async process(job: Job<NewsAnalysisJobData>): Promise<NewsAnalysisResult> {
-    const { taskId, executionId } = job.data;
-
-    this.logger.log(`Processing news analysis job for task: ${taskId}`);
-
     try {
+      const { taskId, executionId } = v.parse(
+        NewsAnalysisJobDataSchema,
+        job.data,
+      );
+
+      this.logger.log(`Processing news analysis job for task: ${taskId}`);
       // Get the fetched result from the previous execution
       const fetchExecution = await this.prisma.taskExecution.findUnique({
         where: {
@@ -95,12 +101,20 @@ export class NewsAnalysisWorker extends WorkerHost {
         {
           completedAt: new Date(),
           result: analyzedResult,
-        }
+        },
       );
 
       this.logger.log(`News analysis completed for task: ${taskId}`);
     } catch (error) {
-      this.logger.error(`News analysis failed for task: ${taskId}`, error);
+      if (error instanceof v.ValiError) {
+        this.logger.error(
+          "News analysis failed for task: ",
+          error.message,
+          job.data,
+        );
+        throw new UnrecoverableError(error.message);
+      }
+      this.logger.error("News analysis failed for task: ", error, job.data);
       // let the scheduler retry
       throw error;
     }

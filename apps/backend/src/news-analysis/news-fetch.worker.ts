@@ -5,18 +5,21 @@ import {
   OnWorkerEvent,
 } from "@nestjs/bullmq";
 import { Logger } from "@nestjs/common";
-import { Job, Queue } from "bullmq";
+import { Job, Queue, UnrecoverableError } from "bullmq";
 import { PrismaService } from "@/prisma.service";
 import { NewsFetchService } from "./news-fetch.service";
 import { ExecutionStatus } from "@prisma/client";
 import { generateJobId } from "@/utils/bullmq-id.util";
 import { type NewsAnalysisQueue } from "./news-analysis.worker";
 import { TaskExecutionService } from "@/task-execution/task-execution.service";
+import * as v from "valibot";
 
-export interface NewsFetchJobData {
-  taskId: string;
-  executionId: string;
-}
+const NewsFetchJobDataSchema = v.strictObject({
+  taskId: v.string(),
+  executionId: v.string(),
+});
+
+export type NewsFetchJobData = v.InferOutput<typeof NewsFetchJobDataSchema>;
 
 export type NewsFetchResult = undefined;
 
@@ -38,7 +41,7 @@ export class NewsFetchWorker extends WorkerHost {
       {
         completedAt: new Date(),
         errorMessage: job.failedReason,
-      }
+      },
     );
   }
 
@@ -46,22 +49,23 @@ export class NewsFetchWorker extends WorkerHost {
     private readonly prisma: PrismaService,
     private readonly newsFetchService: NewsFetchService,
     private readonly taskExecutionService: TaskExecutionService,
-    @InjectQueue("news-analysis") private readonly newsAnalysisQueue: NewsAnalysisQueue,
+    @InjectQueue("news-analysis")
+    private readonly newsAnalysisQueue: NewsAnalysisQueue,
   ) {
     super();
   }
 
   async process(job: Job<NewsFetchJobData>): Promise<NewsFetchResult> {
-    const { taskId, executionId } = job.data;
-
-    this.logger.log(
-      `Processing news fetch job for task: ${taskId}, execution: ${executionId}`,
-    );
-
     try {
+      const { taskId, executionId } = v.parse(NewsFetchJobDataSchema, job.data);
+
+      this.logger.log(
+        `Processing news fetch job for task: ${taskId}, execution: ${executionId}`,
+      );
+
       // Get execution and task parameters
       const execution = await this.prisma.taskExecution.findUnique({
-        where: { id: executionId },
+        where: { id: executionId, taskId },
         include: { task: { select: { parameters: true } } },
       });
 
@@ -74,7 +78,7 @@ export class NewsFetchWorker extends WorkerHost {
       // Update status to FETCHING
       await this.taskExecutionService.updateExecutionStatus(
         executionId,
-        ExecutionStatus.FETCHING
+        ExecutionStatus.FETCHING,
       );
 
       this.logger.log("Starting news fetch:", {
@@ -92,7 +96,7 @@ export class NewsFetchWorker extends WorkerHost {
           {
             completedAt: new Date(),
             result: fetchedResult,
-          }
+          },
         );
 
         this.logger.log(`News fetch completed for task: ${taskId}`);
@@ -107,12 +111,19 @@ export class NewsFetchWorker extends WorkerHost {
           {
             completedAt: new Date(),
             result: fetchedResult,
-          }
+          },
         );
       }
     } catch (error) {
-      this.logger.error(`News fetch failed for task: ${taskId}`, error);
-
+      if (error instanceof v.ValiError) {
+        this.logger.error(
+          "News fetch failed for task: ",
+          error.message,
+          job.data,
+        );
+        throw new UnrecoverableError(error.message);
+      }
+      this.logger.error("News fetch failed for task: ", error, job.data);
       throw error;
     }
   }
