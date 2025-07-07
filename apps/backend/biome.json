@@ -21,13 +21,6 @@
       }
     }
   },
-  "assist": {
-    "actions": {
-      "source": {
-        "organizeImports": "off"
-      }
-    }
-  },
   "javascript": {
     "parser": {
       "unsafeParameterDecoratorsEnabled": true
