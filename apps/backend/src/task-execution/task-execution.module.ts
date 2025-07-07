@@ -1,7 +1,7 @@
-import { Module, forwardRef } from "@nestjs/common";
-import { TaskExecutionService } from "./task-execution.service";
+import { forwardRef, Module } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
 import { WebPushModule } from "@/webpush/webpush.module";
+import { TaskExecutionService } from "./task-execution.service";
 
 @Module({
   imports: [forwardRef(() => WebPushModule)],

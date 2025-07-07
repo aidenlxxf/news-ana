@@ -1,16 +1,16 @@
+import { BullModule } from "@nestjs/bullmq";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { BullModule } from "@nestjs/bullmq";
+import { AuthModule } from "../auth/auth.module";
 import { PrismaService } from "../prisma.service";
-import { NewsAnalysisTaskService } from "./news-analysis-task.service";
+import { TaskExecutionModule } from "../task-execution/task-execution.module";
+import { NewsAnalysisController } from "./news-analysis.controller";
+import { NewsAnalysisService } from "./news-analysis.service";
 import { NewsAnalysisWorker } from "./news-analysis.worker";
+import { NewsAnalysisTaskService } from "./news-analysis-task.service";
+import { NewsFetchService } from "./news-fetch.service";
 import { NewsFetchWorker } from "./news-fetch.worker";
 import { TaskSchedulerWorker } from "./task-scheduler.worker";
-import { NewsAnalysisController } from "./news-analysis.controller";
-import { NewsFetchService } from "./news-fetch.service";
-import { NewsAnalysisService } from "./news-analysis.service";
-import { TaskExecutionModule } from "../task-execution/task-execution.module";
-import { AuthModule } from "../auth/auth.module";
 
 @Module({
   imports: [

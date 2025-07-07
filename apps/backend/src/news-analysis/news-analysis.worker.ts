@@ -1,12 +1,12 @@
+import { isFetchedResult } from "@na/schema";
 import { OnWorkerEvent, Processor, WorkerHost } from "@nestjs/bullmq";
 import { Logger } from "@nestjs/common";
-import { Job, Queue, UnrecoverableError } from "bullmq";
-import { PrismaService } from "@/prisma.service";
-import { NewsAnalysisService } from "./news-analysis.service";
 import { ExecutionStatus } from "@prisma/client";
-import { TaskExecutionService } from "@/task-execution/task-execution.service";
+import { Job, Queue, UnrecoverableError } from "bullmq";
 import * as v from "valibot";
-import { isFetchedResult } from "@na/schema";
+import { PrismaService } from "@/prisma.service";
+import { TaskExecutionService } from "@/task-execution/task-execution.service";
+import { NewsAnalysisService } from "./news-analysis.service";
 
 const NewsAnalysisJobDataSchema = v.strictObject({
   taskId: v.string(),

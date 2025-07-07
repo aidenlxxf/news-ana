@@ -8,9 +8,8 @@ import {
   PipeTransform,
 } from "@nestjs/common";
 import * as v from "valibot";
-
-import { ValibotDto } from "./valibot.dto";
 import { TypeschemaOptions } from "./valibot.constants";
+import { ValibotDto } from "./valibot.dto";
 
 export interface ValidationPipeOptions {
   exceptionFactory?: <

@@ -1,13 +1,13 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { getTopHeadlines, GetTopHeadlinesData } from "@/clients/newsapi";
-import { client as newsApiClient } from "@/clients/newsapi/client.gen";
-import { distinct } from "@std/collections/distinct";
-import { TaskParametersV1 } from "@na/schema";
 import {
   NewsAnalysisResultV1Fetched,
   NewsArticle,
+  TaskParametersV1,
 } from "@na/schema";
+import { Injectable, Logger } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { distinct } from "@std/collections/distinct";
+import { GetTopHeadlinesData, getTopHeadlines } from "@/clients/newsapi";
+import { client as newsApiClient } from "@/clients/newsapi/client.gen";
 
 @Injectable()
 export class NewsFetchService {
@@ -21,7 +21,9 @@ export class NewsFetchService {
     });
   }
 
-  async fetchNews(params: TaskParametersV1): Promise<NewsAnalysisResultV1Fetched> {
+  async fetchNews(
+    params: TaskParametersV1,
+  ): Promise<NewsAnalysisResultV1Fetched> {
     this.logger.log(`Starting news fetch for: ${JSON.stringify(params)}`);
 
     try {
@@ -81,7 +83,9 @@ export class NewsFetchService {
     }
   }
 
-  private createFetchedResult(articles: NewsArticle[]): NewsAnalysisResultV1Fetched {
+  private createFetchedResult(
+    articles: NewsArticle[],
+  ): NewsAnalysisResultV1Fetched {
     const now = new Date().toISOString();
 
     const sources = distinct(

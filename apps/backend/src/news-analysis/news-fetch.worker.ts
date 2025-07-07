@@ -1,18 +1,18 @@
 import {
-  Processor,
-  WorkerHost,
   InjectQueue,
   OnWorkerEvent,
+  Processor,
+  WorkerHost,
 } from "@nestjs/bullmq";
 import { Logger } from "@nestjs/common";
-import { Job, Queue, UnrecoverableError } from "bullmq";
-import { PrismaService } from "@/prisma.service";
-import { NewsFetchService } from "./news-fetch.service";
 import { ExecutionStatus } from "@prisma/client";
+import { Job, Queue, UnrecoverableError } from "bullmq";
+import * as v from "valibot";
+import { PrismaService } from "@/prisma.service";
+import { TaskExecutionService } from "@/task-execution/task-execution.service";
 import { generateJobId } from "@/utils/bullmq-id.util";
 import { type NewsAnalysisQueue } from "./news-analysis.worker";
-import { TaskExecutionService } from "@/task-execution/task-execution.service";
-import * as v from "valibot";
+import { NewsFetchService } from "./news-fetch.service";
 
 const NewsFetchJobDataSchema = v.strictObject({
   taskId: v.string(),

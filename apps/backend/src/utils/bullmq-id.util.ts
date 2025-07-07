@@ -30,5 +30,4 @@ export function parseExecutionIdFromJobId(
     return null;
   }
   return jobId.substring(prefixFull.length);
-
 }

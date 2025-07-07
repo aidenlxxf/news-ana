@@ -1,4 +1,4 @@
-import { PushSubscriptionSchema, PushNotificationDto } from "@na/schema";
+import { PushNotificationDto, PushSubscriptionSchema } from "@na/schema";
 import { ValibotDto } from "@/validators/valibot.dto";
 
 export type { PushNotificationDto };

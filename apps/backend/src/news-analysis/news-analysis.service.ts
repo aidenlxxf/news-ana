@@ -1,17 +1,17 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { generateObject } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 import { valibotSchema } from "@ai-sdk/valibot";
 import {
   NewsAIAnalysisOutput,
+  NewsAnalysisResultV1,
+  NewsAnalysisResultV1Analyzed,
+  NewsAnalysisResultV1Fetched,
+  NewsArticle,
   newsAIAnalysisOutputSchema,
   TaskParametersV1,
-  NewsAnalysisResultV1Fetched,
-  NewsAnalysisResultV1Analyzed,
-  NewsArticle,
-  NewsAnalysisResultV1,
 } from "@na/schema";
+import { Injectable, Logger } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { generateObject } from "ai";
 
 const SYSTEM_PROMPT = `You are a professional news analyst. Your task is to analyze a collection of news articles and provide a structured analysis in JSON format.
 

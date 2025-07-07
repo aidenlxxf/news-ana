@@ -1,11 +1,11 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { PrismaService } from "@/prisma.service";
 import { PushSubscription } from "@prisma/client";
 import * as webpush from "web-push";
+import { PrismaService } from "@/prisma.service";
 import {
-  PushSubscriptionDto,
   PushNotificationDto,
+  PushSubscriptionDto,
 } from "./dto/push-subscription.dto";
 
 @Injectable()

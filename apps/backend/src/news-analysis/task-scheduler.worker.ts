@@ -1,10 +1,10 @@
-import { Processor, WorkerHost, InjectQueue } from "@nestjs/bullmq";
+import { InjectQueue, Processor, WorkerHost } from "@nestjs/bullmq";
 import { Logger } from "@nestjs/common";
-import { Job, Queue } from "bullmq";
 import { Prisma } from "@prisma/client";
+import { Job, Queue } from "bullmq";
+import { TaskExecutionService } from "@/task-execution/task-execution.service";
 import { generateJobId, generateSchedulerId } from "@/utils/bullmq-id.util";
 import { type NewsFetchQueue } from "./news-fetch.worker";
-import { TaskExecutionService } from "@/task-execution/task-execution.service";
 
 export interface TaskSchedulerJobData {
   taskId: string;

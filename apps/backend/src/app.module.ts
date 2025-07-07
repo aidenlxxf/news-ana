@@ -1,13 +1,13 @@
+import { BullModule } from "@nestjs/bullmq";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { APP_FILTER } from "@nestjs/core";
-import { BullModule } from "@nestjs/bullmq";
-import { PrismaService } from "./prisma.service";
-import { AllExceptionsFilter } from "./filters/http-exception.filter";
 import { AuthModule } from "./auth/auth.module";
+import { AllExceptionsFilter } from "./filters/http-exception.filter";
+import { NewsAnalysisModule } from "./news-analysis/news-analysis.module";
+import { PrismaService } from "./prisma.service";
 import { TaskExecutionModule } from "./task-execution/task-execution.module";
 import { WebPushModule } from "./webpush/webpush.module";
-import { NewsAnalysisModule } from "./news-analysis/news-analysis.module";
 
 @Module({
   imports: [
