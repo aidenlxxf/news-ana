@@ -3,6 +3,7 @@
   "files": {
     "includes": [
       "**",
+      "!**/.next",
       "!**/node_modules/**/*",
       "!**/.turbo",
       "!**/dist/**/*"
@@ -25,7 +26,7 @@
   "assist": {
     "actions": {
       "source": {
-        "organizeImports": "off"
+        "organizeImports": "on"
       }
     }
   },
