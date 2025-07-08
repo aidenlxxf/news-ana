@@ -1,3 +1,5 @@
+import type { NewsAnalysisResultV1 } from "../news-analysis/news-analysis.schema.js";
+
 // Common execution status type (matches Prisma enum)
 export type ExecutionStatus = "PENDING" | "FETCHING" | "ANALYZING" | "COMPLETED" | "FAILED";
 
@@ -52,7 +54,7 @@ export interface TaskExecution {
   status: ExecutionStatus;
   startedAt?: string;
   completedAt?: string;
-  result?: any;
+  result: NewsAnalysisResultV1 | null;
   errorMessage?: string;
 }
 
@@ -66,13 +68,7 @@ export interface PushNotificationDto {
 // Get Latest Result Response
 export interface GetLatestResultResponseDto {
   taskId: string;
-  execution?: {
-    id: string;
-    status: ExecutionStatus;
-    startedAt: string;
-    completedAt?: string;
-    result: any; // NewsAnalysisResult
-  };
+  execution?: TaskExecution;
   hasResult: boolean;
 }
 
