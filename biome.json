@@ -26,7 +26,7 @@
   "assist": {
     "actions": {
       "source": {
-        "organizeImports": "on"
+        "organizeImports": "off"
       }
     }
   },
@@ -34,6 +34,9 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "nursery": {
+        "noTsIgnore": "off"
+      },
       "style": {
         "useTemplate": "info",
         "noNonNullAssertion": "off",

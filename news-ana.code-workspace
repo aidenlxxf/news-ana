@@ -6,10 +6,9 @@
 		{
 			"path": "apps/frontend"
 		},
-		{
-			"name": "root",
-			"path": "."
-		}
+               {
+                        "path": "packages/schema"
+                }
 	],
 	"settings": {
 		"typescript.tsdk": "root/node_modules/typescript/lib"
