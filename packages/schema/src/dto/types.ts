@@ -17,7 +17,8 @@ export interface GetTaskResponseDto {
   createdAt: string;
   lastExecution?: {
     status: ExecutionStatus;
-    startedAt: string;
+    createdAt: string;
+    startedAt?: string;
     completedAt?: string;
   };
 }
@@ -45,7 +46,12 @@ export interface TaskSummary {
   query?: string;
   /** ISO 8601 */
   createdAt: string;
-  lastExecutionStatus?: ExecutionStatus;
+  lastExecution?: {
+    status: ExecutionStatus;
+    createdAt: string;
+    startedAt?: string;
+    completedAt?: string;
+  };
 }
 
 export interface ListTaskExecutionsResponseDto {

@@ -104,7 +104,9 @@ export default function ExecutionStatus({
               <div>
                 <p className="text-sm font-medium text-gray-900">Start Time</p>
                 <p className="text-sm text-gray-600">
-                  {new Date(lastExecution.startedAt).toLocaleString("en-US", {
+                  {new Date(
+                    lastExecution.startedAt ?? lastExecution.createdAt,
+                  ).toLocaleString("en-US", {
                     year: "numeric",
                     month: "2-digit",
                     day: "2-digit",
@@ -152,7 +154,7 @@ export default function ExecutionStatus({
                   <p className="text-sm text-gray-600">
                     {Math.round(
                       (new Date(lastExecution.completedAt).getTime() -
-                        new Date(lastExecution.startedAt).getTime()) /
+                        new Date(lastExecution.createdAt).getTime()) /
                         1000,
                     )}{" "}
                     seconds

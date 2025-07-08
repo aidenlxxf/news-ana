@@ -61,6 +61,7 @@ model TaskExecution {
   id           String          @id @default(uuid())
   taskId       String          @map("task_id")
   status       ExecutionStatus @default(PENDING)
+  createdAt    DateTime        @default(now()) @map("created_at")
   startedAt    DateTime?       @map("started_at")
   completedAt  DateTime?       @map("completed_at")
   /// [NewsAnalysisResult]

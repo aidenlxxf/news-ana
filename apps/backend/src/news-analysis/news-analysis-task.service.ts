@@ -98,6 +98,7 @@ export class NewsAnalysisTaskService {
             status: true,
             startedAt: true,
             completedAt: true,
+            createdAt: true,
           },
           orderBy: { startedAt: "desc" },
           take: 1,
@@ -121,7 +122,8 @@ export class NewsAnalysisTaskService {
       lastExecution: lastExecution
         ? {
             status: lastExecution.status,
-            startedAt: lastExecution.startedAt?.toISOString() || "",
+            createdAt: lastExecution.createdAt.toISOString(),
+            startedAt: lastExecution.startedAt?.toISOString(),
             completedAt: lastExecution.completedAt?.toISOString(),
           }
         : undefined,
@@ -219,6 +221,9 @@ export class NewsAnalysisTaskService {
           take: 1,
           select: {
             status: true,
+            startedAt: true,
+            completedAt: true,
+            createdAt: true,
           },
         },
       },
@@ -235,7 +240,12 @@ export class NewsAnalysisTaskService {
           category: params.category ?? undefined,
           query: params.query ?? undefined,
           createdAt: createdAt.toISOString(),
-          lastExecutionStatus: executions[0]?.status,
+          lastExecution: executions[0] && {
+            status: executions[0].status,
+            createdAt: executions[0].createdAt.toISOString(),
+            startedAt: executions[0].startedAt?.toISOString(),
+            completedAt: executions[0].completedAt?.toISOString(),
+          },
         };
       }),
       limit,

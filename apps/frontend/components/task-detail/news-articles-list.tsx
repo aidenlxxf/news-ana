@@ -89,31 +89,33 @@ export default function NewsArticlesList({
                 </div>
 
                 {/* Action buttons */}
-                <div className="flex items-center justify-between">
-                  <Button
-                    asChild
-                    variant="outline"
-                    size="sm"
-                    className="text-xs"
-                  >
-                    <a
-                      href={article.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1"
+                <div className="space-y-2">
+                  <div>
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
                     >
-                      <ExternalLink className="h-3 w-3" />
-                      Read Original
-                    </a>
-                  </Button>
+                      <a
+                        href={article.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                        Read Original
+                      </a>
+                    </Button>
+                  </div>
 
                   {/* Content preview (if available) */}
                   {article.content && (
-                    <span className="text-xs text-gray-400">
+                    <div className="text-xs text-gray-400 leading-relaxed">
                       {article.content.length > 100
                         ? `${article.content.substring(0, 100)}...`
                         : article.content}
-                    </span>
+                    </div>
                   )}
                 </div>
               </div>
