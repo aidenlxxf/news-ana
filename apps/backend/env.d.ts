@@ -12,5 +12,7 @@ declare namespace NodeJS {
     JWT_SECRET: string;
     /** JWT token expiration time (e.g., '1d', '7d', '24h') */
     JWT_EXPIRES_IN: string;
+    /** Name of the cookie to store the JWT token */
+    AUTH_COOKIE_NAME: string;
   }
 }
