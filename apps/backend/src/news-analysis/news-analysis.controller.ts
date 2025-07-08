@@ -12,7 +12,7 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { User as UserEntity } from "@prisma/client";
-import { BasicAuthGuard } from "../auth/basic-auth.guard";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { User } from "../auth/user.decorator";
 import { ValidationPipe } from "../validators/valibot.pipe";
 import {
@@ -33,7 +33,7 @@ import { type RefreshTaskResponseDto } from "./dto/refresh-task.dto";
 import { NewsAnalysisTaskService } from "./news-analysis-task.service";
 
 @Controller("news-analysis")
-@UseGuards(BasicAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class NewsAnalysisController {
   constructor(private readonly newsAnalysisService: NewsAnalysisTaskService) {}
 

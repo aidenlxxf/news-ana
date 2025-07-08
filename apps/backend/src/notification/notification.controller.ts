@@ -10,7 +10,7 @@ import {
   MessageEvent,
 } from "@nestjs/common";
 import { User as UserEntity } from "@prisma/client";
-import { BasicAuthGuard } from "@/auth/basic-auth.guard";
+import { JwtAuthGuard } from "@/auth/guards/jwt-auth.guard";
 import { User } from "@/auth/user.decorator";
 import { CreatePushSubscriptionDto } from "./dto/push-subscription.dto";
 import { NotificationService } from "./notification.service";
@@ -18,7 +18,7 @@ import { Observable, map, interval, merge } from "rxjs";
 import { TaskNotificationDto } from "./dto/push-subscription.dto";
 
 @Controller("notifications")
-@UseGuards(BasicAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
@@ -43,33 +43,38 @@ export class NotificationController {
   @Sse("sse")
   streamNotifications(@User() user: UserEntity): Observable<MessageEvent> {
     // Create SSE connection for the user
-    const notificationStream = this.notificationService.createSSEConnection(user.id);
-    
+    const notificationStream = this.notificationService.createSSEConnection(
+      user.id,
+    );
+
     // Create heartbeat stream (every 30 seconds)
     const heartbeat = interval(30000).pipe(
-      map(() => ({
-        type: "heartbeat",
-        data: { timestamp: new Date().toISOString() },
-      } satisfies MessageEvent))
+      map(
+        () =>
+          ({
+            type: "heartbeat",
+            data: { timestamp: new Date().toISOString() },
+          }) satisfies MessageEvent,
+      ),
     );
-    
+
     // Create notification stream
     const notifications = notificationStream.pipe(
-      map((notification: TaskNotificationDto) => ({
-        type: "notification",
-        data: notification,
-      } satisfies MessageEvent))
+      map(
+        (notification: TaskNotificationDto) =>
+          ({
+            type: "notification",
+            data: notification,
+          }) satisfies MessageEvent,
+      ),
     );
-    
+
     // Merge heartbeat and notifications
     return merge(heartbeat, notifications);
   }
 
-
   @Get("status")
-  async getStatus(
-    @User() user: UserEntity,
-  ): Promise<{
+  async getStatus(@User() user: UserEntity): Promise<{
     sseConnections: number;
     pushSubscriptions: number;
   }> {
