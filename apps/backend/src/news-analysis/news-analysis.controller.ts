@@ -32,7 +32,7 @@ import {
 import { type RefreshTaskResponseDto } from "./dto/refresh-task.dto";
 import { NewsAnalysisTaskService } from "./news-analysis-task.service";
 
-@Controller("api/news-analysis")
+@Controller("news-analysis")
 @UseGuards(BasicAuthGuard)
 export class NewsAnalysisController {
   constructor(private readonly newsAnalysisService: NewsAnalysisTaskService) {}

@@ -66,24 +66,24 @@ export async function listTasks(
     offset: offset.toString(),
   });
 
-  return apiCall<ListTasksResponseDto>(`/api/news-analysis/tasks?${params}`);
+  return apiCall<ListTasksResponseDto>(`/news-analysis/tasks?${params}`);
 }
 
 export async function createTask(
   taskData: CreateTaskDtoType,
 ): Promise<CreateTaskResponseDto> {
-  return apiCall<CreateTaskResponseDto>("/api/news-analysis/tasks", {
+  return apiCall<CreateTaskResponseDto>("/news-analysis/tasks", {
     method: "POST",
     body: JSON.stringify(taskData),
   });
 }
 
 export async function getTask(taskId: string): Promise<GetTaskResponseDto> {
-  return apiCall<GetTaskResponseDto>(`/api/news-analysis/tasks/${taskId}`);
+  return apiCall<GetTaskResponseDto>(`/news-analysis/tasks/${taskId}`);
 }
 
 export async function deleteTask(taskId: string): Promise<{ message: string }> {
-  return apiCall<{ message: string }>(`/api/news-analysis/tasks/${taskId}`, {
+  return apiCall<{ message: string }>(`/news-analysis/tasks/${taskId}`, {
     method: "DELETE",
   });
 }
@@ -92,7 +92,7 @@ export async function refreshTask(
   taskId: string,
 ): Promise<RefreshTaskResponseDto> {
   return apiCall<RefreshTaskResponseDto>(
-    `/api/news-analysis/tasks/${taskId}/refresh`,
+    `/news-analysis/tasks/${taskId}/refresh`,
     {
       method: "POST",
     },
@@ -103,12 +103,12 @@ export async function getLatestResult(
   taskId: string,
 ): Promise<GetLatestResultResponseDto> {
   return apiCall<GetLatestResultResponseDto>(
-    `/api/news-analysis/tasks/${taskId}/latest-result`,
+    `/news-analysis/tasks/${taskId}/latest-result`,
   );
 }
 
 export async function getExecution(
   executionId: string,
 ): Promise<TaskExecution> {
-  return apiCall<TaskExecution>(`/api/news-analysis/executions/${executionId}`);
+  return apiCall<TaskExecution>(`/news-analysis/executions/${executionId}`);
 }
