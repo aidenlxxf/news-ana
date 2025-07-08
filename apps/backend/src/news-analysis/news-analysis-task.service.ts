@@ -62,7 +62,7 @@ export class NewsAnalysisTaskService {
     const paramsHash = generateParamsHash(country, category, query);
     const task = await this.prisma.$transaction(async (tx) => {
       const existing = await tx.task.findUnique({
-        where: { paramsHash },
+        where: { userId_paramsHash: { userId, paramsHash } },
         select: { id: true },
       });
       if (existing) {

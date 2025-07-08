@@ -46,7 +46,7 @@ model Task {
   userId     String   @map("user_id")
   /// [TaskParameters]
   parameters Json // Dynamic parameters (country, category, query, etc.)
-  paramsHash String   @unique @map("params_hash")
+  paramsHash String   @map("params_hash")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
@@ -54,6 +54,7 @@ model Task {
   executions TaskExecution[]
 
   @@map("tasks")
+  @@unique([userId, paramsHash])
 }
 
 model TaskExecution {
