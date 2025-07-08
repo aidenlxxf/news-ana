@@ -10,5 +10,28 @@ export interface CreateTaskActionState {
 // Service Worker Message Types
 export interface NewsUpdateMessage {
   type: "news-update";
-  taskId?: string;
+  payload: TaskNotificationDto;
+}
+
+declare global {
+  interface WindowEventMap {
+    "news-update": NewsUpdateEvent;
+  }
+}
+
+export function isNewsUpdateMessage(
+  message: unknown,
+): message is NewsUpdateMessage {
+  return (
+    typeof message === "object" &&
+    message !== null &&
+    "type" in message &&
+    message.type === "news-update"
+  );
+}
+
+export class NewsUpdateEvent extends CustomEvent<TaskNotificationDto> {
+  constructor(data: TaskNotificationDto) {
+    super("news-update", { detail: data });
+  }
 }

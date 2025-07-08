@@ -1,6 +1,6 @@
 import CreateTaskForm from "@/components/create-task-form";
-import SubscribeButton from "@/components/subscribe";
 import TaskList from "@/components/task-list";
+import Toolbar from "@/components/toolbar";
 
 export default function Home() {
   return (
@@ -18,7 +18,7 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column: Task List */}
           <div className="space-y-6">
-            <SubscribeButton />
+            <Toolbar />
             <TaskList />
           </div>
 

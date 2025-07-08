@@ -2,35 +2,26 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useServiceWorker } from "@/hooks/use-push-subscription";
-import type { NewsUpdateMessage } from "@/types/frontend";
+import { useServiceWorker } from "@/hooks/web-push";
+import { useSSEConnection } from "@/hooks/sse-push";
+import type { NewsUpdateEvent } from "@/types/frontend";
 import { toast } from "sonner";
 
 export default function ServiceWorkerHandler() {
   const router = useRouter();
 
   useServiceWorker();
+  useSSEConnection();
 
   useEffect(() => {
-    if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
-      return;
+    function handler(event: NewsUpdateEvent) {
+      router.refresh();
+      router.prefetch(`/tasks/${event.detail.taskId}`);
+      router.prefetch("/");
+      toast.success(event.detail.message);
     }
-
-    const handleMessage = (event: MessageEvent<NewsUpdateMessage>) => {
-      console.log("handle service worker message", event.data);
-      if (event.data?.type === "news-update") {
-        toast.info("You got news analysis updated!");
-        // Refresh the current page data
-        router.refresh();
-      }
-    };
-
-    // Listen for messages from service worker
-    navigator.serviceWorker.addEventListener("message", handleMessage);
-
-    return () => {
-      navigator.serviceWorker.removeEventListener("message", handleMessage);
-    };
+    window.addEventListener("news-update", handler);
+    return () => window.removeEventListener("news-update", handler);
   }, [router]);
 
   // This component doesn't render anything

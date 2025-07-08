@@ -11,7 +11,8 @@ import type {
 } from "@na/schema";
 
 // Backend API base URL - assuming backend runs on port 3001
-const API_BASE_URL = process.env.BACKEND_HOST || "http://localhost:3001";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_BACKEND_HOST || "http://localhost:3001";
 
 // Test credentials
 const AUTH_USERNAME = "test";
@@ -131,12 +132,12 @@ export async function getExecution(
   return apiCall<TaskExecution>(`/news-analysis/executions/${executionId}`);
 }
 
-// WebPush API Functions
+// Notification API Functions
 export async function subscribeWebPush(
   subscription: CreatePushSubscriptionDtoType,
 ): Promise<{ success: boolean }> {
   return apiCall<{ success: boolean }, CreatePushSubscriptionDtoType>(
-    "/webpush/subscriptions",
+    "/notifications/subscribe",
     {
       method: "POST",
       jsonBody: subscription,
@@ -150,7 +151,7 @@ export async function unsubscribeWebPush({
   endpointHash: string;
 }): Promise<{ success: boolean }> {
   return apiCall<{ success: boolean }>(
-    `/webpush/subscriptions/${endpointHash}`,
+    `/notifications/subscribe/${endpointHash}`,
     {
       method: "DELETE",
     },

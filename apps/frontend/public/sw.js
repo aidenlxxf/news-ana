@@ -44,14 +44,14 @@
 
     for (const client of taskRelatedClients) {
       /** @type {import("../types/frontend").NewsUpdateMessage} */
-      const message = { type: "news-update", taskId: data.taskId };
+      const message = { type: "news-update", payload: data };
       client.postMessage(message);
     }
     if (
       taskRelatedClients.every((client) => client.visibilityState !== "visible")
     ) {
       await self.registration.showNotification(
-        data.type === "success" ? "Task Completed" : "Task Error",
+        data.status === "success" ? "Task Completed" : "Task Error",
         {
           body: data.message,
           tag: `task-${data.taskId}`,
