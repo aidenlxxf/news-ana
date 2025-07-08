@@ -7,53 +7,33 @@ import { formInteger } from "../utils/form-helpers.js";
 
 // Create Task Schema
 export const CreateTaskSchema = v.pipe(
-  v.pick(
-    v.object({
-      country: v.nullish(NewsApiCountrySchema),
-      category: v.nullish(NewsApiCategorySchema),
-      query: v.nullish(v.string()),
-    }),
-    ["country", "category", "query"],
-  ),
+  v.object({
+    country: v.nullish(NewsApiCountrySchema, null),
+    category: v.nullish(NewsApiCategorySchema, null),
+    query: v.nullish(v.string(), null),
+  }),
   v.check(
-    (params) =>
-      !(
-        params.category === undefined &&
-        params.country === undefined &&
-        params.query === undefined
-      ),
+    (params) => !!(params.category || params.country || params.query),
     "at least one of country, category, or query must be provided",
   ),
-  v.transform((params) => ({
-    ...params,
-    country: params.country ?? null,
-    category: params.category ?? null,
-    query: params.query ?? null,
-  })),
   v.brand("CreateTaskSchema"),
 );
 
 export type CreateTaskDtoType = v.InferOutput<typeof CreateTaskSchema>;
 
 // List Tasks Query Schema
-export const ListTasksQuerySchema = v.pick(
-  v.object({
-    limit: v.pipe(formInteger(20), v.minValue(1)),
-    offset: v.pipe(formInteger(0), v.minValue(0)),
-  }),
-  ["limit", "offset"],
-);
+export const ListTasksQuerySchema = v.object({
+  limit: v.pipe(formInteger(20), v.minValue(1)),
+  offset: v.pipe(formInteger(0), v.minValue(0)),
+});
 
 export type ListTasksQueryType = v.InferOutput<typeof ListTasksQuerySchema>;
 
 // List Task Executions Query Schema
-export const ListTaskExecutionsQuerySchema = v.pick(
-  v.object({
-    limit: v.pipe(formInteger(20), v.minValue(1)),
-    offset: v.pipe(formInteger(0), v.minValue(0)),
-  }),
-  ["limit", "offset"],
-);
+export const ListTaskExecutionsQuerySchema = v.object({
+  limit: v.pipe(formInteger(20), v.minValue(1)),
+  offset: v.pipe(formInteger(0), v.minValue(0)),
+});
 
 export type ListTaskExecutionsQueryType = v.InferOutput<
   typeof ListTaskExecutionsQuerySchema
