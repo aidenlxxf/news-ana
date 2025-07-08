@@ -1,7 +1,12 @@
 import type { NewsAnalysisResultV1 } from "../news-analysis/news-analysis.schema.js";
 
 // Common execution status type (matches Prisma enum)
-export type ExecutionStatus = "PENDING" | "FETCHING" | "ANALYZING" | "COMPLETED" | "FAILED";
+export type ExecutionStatus =
+  | "PENDING"
+  | "FETCHING"
+  | "ANALYZING"
+  | "COMPLETED"
+  | "FAILED";
 
 // Task-related DTO interfaces
 export interface GetTaskResponseDto {
@@ -73,8 +78,9 @@ export interface GetLatestResultResponseDto {
 }
 
 // API Error Response
-export interface ApiErrorResponse {
+export interface ApiErrorResponse<TData = unknown> {
   message: string;
   statusCode: number;
   error?: string;
+  data?: TData;
 }

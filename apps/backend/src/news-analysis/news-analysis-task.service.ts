@@ -1,4 +1,5 @@
 import {
+  ApiErrorResponse,
   TaskExecution,
   TaskParametersV1,
   TaskParametersV1Schema,
@@ -58,28 +59,29 @@ export class NewsAnalysisTaskService {
       version: "news-fetch:v1",
     });
 
+    const paramsHash = generateParamsHash(country, category, query);
     const task = await this.prisma.$transaction(async (tx) => {
-      try {
-        const task = await tx.task.create({
-          data: {
-            userId,
-            parameters,
-            paramsHash: generateParamsHash(country, category, query),
-          },
-        });
-        await this.scheduleTask(task.id);
-
-        return task;
-      } catch (err) {
-        if (err instanceof Prisma.PrismaClientKnownRequestError) {
-          if (err.code === "P2002") {
-            throw new ConflictException(
-              "Task with same parameters already exists",
-            );
-          }
-        }
-        throw err;
+      const existing = await tx.task.findUnique({
+        where: { paramsHash },
+        select: { id: true },
+      });
+      if (existing) {
+        throw new ConflictException({
+          message: "Task with same parameters already exists",
+          statusCode: 409,
+          data: { taskId: existing.id },
+        } satisfies ApiErrorResponse<{ taskId: string }>);
       }
+      const task = await tx.task.create({
+        data: {
+          userId,
+          parameters,
+          paramsHash: generateParamsHash(country, category, query),
+        },
+      });
+      await this.scheduleTask(task.id);
+
+      return task;
     });
     return {
       taskId: task.id,
