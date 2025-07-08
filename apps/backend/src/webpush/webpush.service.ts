@@ -1,4 +1,4 @@
-import crypto from "node:crypto";
+import { createHash } from "node:crypto";
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PushSubscription } from "@prisma/client";
@@ -40,8 +40,7 @@ export class WebPushService {
     userId: string,
     subscription: CreatePushSubscriptionDto,
   ): Promise<void> {
-    const endpointHash = crypto
-      .createHash("sha256")
+    const endpointHash = createHash("sha256")
       .update(subscription.data.endpoint)
       .digest("hex");
 
@@ -50,6 +49,7 @@ export class WebPushService {
       update: {
         p256dh: subscription.data.keys.p256dh,
         auth: subscription.data.keys.auth,
+        expirationTime: subscription.data.expirationTime,
       },
       create: {
         endpointHash,
@@ -92,14 +92,7 @@ export class WebPushService {
       return;
     }
 
-    const payload = JSON.stringify({
-      title:
-        notification.type === "success"
-          ? "Analysis Complete"
-          : "Analysis Failed",
-      body: notification.message,
-      data: { taskId: notification.taskId },
-    });
+    const payload = JSON.stringify(notification);
 
     try {
       await webpush.sendNotification(
