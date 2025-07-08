@@ -180,6 +180,9 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.2.3
         version: 1.2.3(@types/react@19.1.8)(react@19.1.0)
+      '@std/assert':
+        specifier: npm:@jsr/std__assert@^1.0.13
+        version: '@jsr/std__assert@1.0.13'
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -1156,8 +1159,14 @@ packages:
   '@jsdevtools/ono@7.1.3':
     resolution: {integrity: sha512-4JQNk+3mVzK3xh2rqd6RB4J46qUR19azEHBneZyTZM+c456qOrbbM/5xcR8huNCCcbVt7+UmizG6GuUvPvKUYg==}
 
+  '@jsr/std__assert@1.0.13':
+    resolution: {integrity: sha512-rZ44REoi2/p+gqu8OfkcNeaTOSiG1kD6v8gyA0YjkXsOkDsiGw9g8h7JuGC/OD7GgOVgTEY+9Cih49Y18rkrCQ==, tarball: https://npm.jsr.io/~/11/@jsr/std__assert/1.0.13.tgz}
+
   '@jsr/std__collections@1.1.2':
     resolution: {integrity: sha512-Fen3UrxGCxzra/QGhv6DNEKkzV6OCmWhN090iUF6Q4HRXYsSz9YoFnKci53QPXKnIlaBdha70QiSZDi127OKfQ==, tarball: https://npm.jsr.io/~/11/@jsr/std__collections/1.1.2.tgz}
+
+  '@jsr/std__internal@1.0.9':
+    resolution: {integrity: sha512-s+f4qrJzZgPAy7XuFOtgaSaxyPLnnEmAfXGLvRXGxPTL76URLVHkF+hOzqXz+bmk8/awybF6BRsasxtAQOV23Q==, tarball: https://npm.jsr.io/~/11/@jsr/std__internal/1.0.9.tgz}
 
   '@lukeed/csprng@1.1.0':
     resolution: {integrity: sha512-Z7C/xXCiGWsg0KuKsHTKJxbWhpI3Vs5GwLfOean7MGyVFGqdRgBbAjOCh6u4bbjPc/8MJ2pZmK/0DLdCbivLDA==}
@@ -4601,7 +4610,7 @@ packages:
   supertest@7.1.1:
     resolution: {integrity: sha512-aI59HBTlG9e2wTjxGJV+DygfNLgnWbGdZxiA/sgrnNNikIW8lbDvCtF6RnhZoJ82nU7qv7ZLjrvWqCEm52fAmw==}
     engines: {node: '>=14.18.0'}
-    deprecated: Please upgrade to supertest v7.1.2+, see release notes at https://github.com/forwardemail/supertest/releases/tag/v7.1.2 - maintenance is supported by Forward Email @ https://forwardemail.net
+    deprecated: Please upgrade to supertest v7.1.3+, see release notes at https://github.com/forwardemail/supertest/releases/tag/v7.1.3 - maintenance is supported by Forward Email @ https://forwardemail.net
 
   supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
@@ -6003,7 +6012,13 @@ snapshots:
 
   '@jsdevtools/ono@7.1.3': {}
 
+  '@jsr/std__assert@1.0.13':
+    dependencies:
+      '@jsr/std__internal': 1.0.9
+
   '@jsr/std__collections@1.1.2': {}
+
+  '@jsr/std__internal@1.0.9': {}
 
   '@lukeed/csprng@1.1.0': {}
 
