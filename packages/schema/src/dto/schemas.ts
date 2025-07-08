@@ -1,5 +1,8 @@
 import * as v from "valibot";
-import { NewsApiCategorySchema, NewsApiCountrySchema } from "../news-analysis/task-parameters.schema.js";
+import {
+  NewsApiCategorySchema,
+  NewsApiCountrySchema,
+} from "../news-analysis/task-parameters.schema.js";
 import { formInteger } from "../utils/form-helpers.js";
 
 // Create Task Schema
@@ -52,15 +55,29 @@ export const ListTaskExecutionsQuerySchema = v.pick(
   ["limit", "offset"],
 );
 
-export type ListTaskExecutionsQueryType = v.InferOutput<typeof ListTaskExecutionsQuerySchema>;
+export type ListTaskExecutionsQueryType = v.InferOutput<
+  typeof ListTaskExecutionsQuerySchema
+>;
 
-// Push Subscription Schema
-export const PushSubscriptionSchema = v.object({
+/**
+ * DOM API PushSubscriptionJSON
+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/PushSubscription/toJSON)
+ */
+export const CreatePushSubscriptionSchema = v.object({
   endpoint: v.string(),
+  expirationTime: v.nullish(
+    v.pipe(
+      v.string(),
+      v.isoTimestamp(),
+      v.transform((s) => new Date(s)),
+    ),
+  ),
   keys: v.object({
     p256dh: v.string(),
     auth: v.string(),
   }),
 });
 
-export type PushSubscriptionType = v.InferOutput<typeof PushSubscriptionSchema>;
+export type CreatePushSubscriptionDtoType = v.InferOutput<
+  typeof CreatePushSubscriptionSchema
+>;

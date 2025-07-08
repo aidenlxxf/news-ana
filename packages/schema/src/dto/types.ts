@@ -59,7 +59,7 @@ export interface TaskExecution {
 }
 
 // WebPush related types
-export interface PushNotificationDto {
+export interface TaskNotificationDto {
   taskId: string;
   message: string;
   type: "success" | "error";

@@ -1,6 +1,8 @@
-import { PushNotificationDto, PushSubscriptionSchema } from "@na/schema";
+import { CreatePushSubscriptionSchema, TaskNotificationDto } from "@na/schema";
 import { ValibotDto } from "@/validators/valibot.dto";
 
-export type { PushNotificationDto };
+export type { TaskNotificationDto };
 
-export class PushSubscriptionDto extends ValibotDto(PushSubscriptionSchema) {}
+export class CreatePushSubscriptionDto extends ValibotDto(
+  CreatePushSubscriptionSchema,
+) {}

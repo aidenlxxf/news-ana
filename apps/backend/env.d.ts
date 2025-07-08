@@ -6,5 +6,7 @@ declare namespace NodeJS {
     REDIS_URL: string;
     VAPID_PRIVATE_KEY: string;
     VAPID_PUBLIC_KEY: string;
+    /** contact mailto: or http: for the VAPID subject */
+    VAPID_SUBJECT: string;
   }
 }

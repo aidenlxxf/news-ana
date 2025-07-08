@@ -1,11 +1,12 @@
+import crypto from "node:crypto";
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PushSubscription } from "@prisma/client";
 import * as webpush from "web-push";
 import { PrismaService } from "@/prisma.service";
 import {
-  PushNotificationDto,
-  PushSubscriptionDto,
+  CreatePushSubscriptionDto,
+  TaskNotificationDto,
 } from "./dto/push-subscription.dto";
 
 @Injectable()
@@ -18,58 +19,79 @@ export class WebPushService {
   ) {
     const vapidPublicKey = this.configService.get("VAPID_PUBLIC_KEY");
     const vapidPrivateKey = this.configService.get("VAPID_PRIVATE_KEY");
-    if (!vapidPublicKey || !vapidPrivateKey) {
+    const vapidSubject = this.configService.get("VAPID_SUBJECT");
+    if (!vapidPublicKey || !vapidPrivateKey || !vapidSubject) {
       throw new Error("VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY must be set");
     }
+    if (
+      !vapidSubject.startsWith("mailto:") &&
+      !vapidSubject.startsWith("http:") &&
+      !vapidSubject.startsWith("https:")
+    ) {
+      throw new Error(
+        "VAPID_SUBJECT must start with mailto: or http: or https:",
+      );
+    }
 
-    webpush.setVapidDetails(
-      "mailto:your-email@example.com",
-      vapidPublicKey,
-      vapidPrivateKey,
-    );
+    webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
   }
 
   async subscribeUser(
     userId: string,
-    subscription: PushSubscriptionDto,
+    subscription: CreatePushSubscriptionDto,
   ): Promise<void> {
+    const endpointHash = crypto
+      .createHash("sha256")
+      .update(subscription.data.endpoint)
+      .digest("hex");
+
     await this.prisma.pushSubscription.upsert({
-      where: {
-        userId_endpoint: {
-          userId,
-          endpoint: subscription.data.endpoint,
-        },
-      },
+      where: { endpointHash },
       update: {
         p256dh: subscription.data.keys.p256dh,
         auth: subscription.data.keys.auth,
       },
       create: {
-        userId,
+        endpointHash,
+        expirationTime: subscription.data.expirationTime,
         endpoint: subscription.data.endpoint,
         p256dh: subscription.data.keys.p256dh,
         auth: subscription.data.keys.auth,
+        users: { connect: { id: userId } },
       },
     });
 
     this.logger.log(`Subscribed user ${userId} to push notifications`);
   }
 
-  async unsubscribeUser(userId: string, endpoint: string): Promise<void> {
-    await this.prisma.pushSubscription.deleteMany({
-      where: {
-        userId,
-        endpoint,
-      },
+  async unsubscribeUser(userId: string, endpointHash: string): Promise<void> {
+    await this.prisma.pushSubscription.update({
+      where: { endpointHash },
+      data: { users: { disconnect: { id: userId } } },
     });
 
-    this.logger.log(`Unsubscribed user ${userId} from endpoint ${endpoint}`);
+    this.logger.log(
+      `Unsubscribed user ${userId} from endpoint ${endpointHash}`,
+    );
   }
 
   async sendNotification(
     subscription: PushSubscription,
-    notification: PushNotificationDto,
+    notification: TaskNotificationDto,
   ): Promise<void> {
+    if (
+      subscription.expirationTime &&
+      subscription.expirationTime < new Date()
+    ) {
+      await this.prisma.pushSubscription.deleteMany({
+        where: { endpointHash: subscription.endpointHash },
+      });
+      this.logger.log(
+        `Removed expired subscription ${subscription.endpointHash}`,
+      );
+      return;
+    }
+
     const payload = JSON.stringify({
       title:
         notification.type === "success"
@@ -102,9 +124,11 @@ export class WebPushService {
       // 可以考虑删除无效的订阅
       if (error.statusCode === 410) {
         await this.prisma.pushSubscription.delete({
-          where: { id: subscription.id },
+          where: { endpointHash: subscription.endpointHash },
         });
-        this.logger.log(`Removed invalid subscription ${subscription.id}`);
+        this.logger.log(
+          `Removed invalid subscription ${subscription.endpointHash}`,
+        );
       }
     }
   }

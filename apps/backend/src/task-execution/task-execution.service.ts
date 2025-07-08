@@ -1,4 +1,4 @@
-import { isAnalyzedResult } from "@na/schema";
+import { isAnalyzedResult, TaskNotificationDto } from "@na/schema";
 import { forwardRef, Inject, Injectable, Logger } from "@nestjs/common";
 import {
   ExecutionStatus,
@@ -9,7 +9,6 @@ import {
   User,
 } from "@prisma/client";
 import { PrismaService } from "@/prisma.service";
-import { PushNotificationDto } from "@/webpush/dto/push-subscription.dto";
 import { WebPushService } from "@/webpush/webpush.service";
 
 @Injectable()
@@ -78,7 +77,7 @@ export class TaskExecutionService {
     );
 
     if (this.webPushService) {
-      const notification: PushNotificationDto = {
+      const notification: TaskNotificationDto = {
         taskId: execution.taskId,
         message,
         type: status === ExecutionStatus.COMPLETED ? "success" : "error",

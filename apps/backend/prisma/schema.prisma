@@ -15,58 +15,58 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  username String @unique
+  id        String   @id @default(uuid())
+  username  String   @unique
   /// bcrypt hash
-  password String 
+  password  String
   createdAt DateTime @default(now()) @map("created_at")
 
-  tasks Task[]
+  tasks             Task[]
   pushSubscriptions PushSubscription[]
 
   @@map("users")
 }
 
 model PushSubscription {
-  id       String @id @default(uuid())
-  userId   String @map("user_id")
-  endpoint String
-  p256dh   String
-  auth     String
-  createdAt DateTime @default(now()) @map("created_at")
+  /// SHA-256 hash of the endpoint used as primary key
+  endpointHash String   @id @map("endpoint_hash")
+  endpoint     String
+  p256dh       String
+  auth         String
+  expirationTime DateTime? @map("expiration_time")
+  createdAt    DateTime @default(now()) @map("created_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  users User[]
 
-  @@unique([userId, endpoint])
   @@map("push_subscriptions")
 }
 
 model Task {
-  id          String   @id @default(uuid())
-  userId      String   @map("user_id")
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
   /// [TaskParameters]
-  parameters  Json     // Dynamic parameters (country, category, query, etc.)
-  paramsHash  String   @unique @map("params_hash")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  parameters Json // Dynamic parameters (country, category, query, etc.)
+  paramsHash String   @unique @map("params_hash")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
-  user       User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   executions TaskExecution[]
 
   @@map("tasks")
 }
 
 model TaskExecution {
-  id          String   @id @default(uuid())
-  taskId      String   @map("task_id")
-  status      ExecutionStatus @default(PENDING)
-  startedAt   DateTime? @map("started_at")
-  completedAt DateTime? @map("completed_at")
+  id           String          @id @default(uuid())
+  taskId       String          @map("task_id")
+  status       ExecutionStatus @default(PENDING)
+  startedAt    DateTime?       @map("started_at")
+  completedAt  DateTime?       @map("completed_at")
   /// [NewsAnalysisResult]
-  result      Json?
-  errorMessage String? @map("error_message")
+  result       Json?
+  errorMessage String?         @map("error_message")
 
-  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@map("task_executions")
 }

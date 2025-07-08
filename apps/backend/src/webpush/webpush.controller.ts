@@ -1,8 +1,15 @@
-import { Body, Controller, Delete, Post, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  Post,
+  UseGuards,
+} from "@nestjs/common";
 import { User as UserEntity } from "@prisma/client";
 import { BasicAuthGuard } from "@/auth/basic-auth.guard";
 import { User } from "@/auth/user.decorator";
-import { PushSubscriptionDto } from "./dto/push-subscription.dto";
+import { CreatePushSubscriptionDto } from "./dto/push-subscription.dto";
 import { WebPushService } from "./webpush.service";
 
 @Controller("webpush")
@@ -10,21 +17,21 @@ import { WebPushService } from "./webpush.service";
 export class WebPushController {
   constructor(private readonly webPushService: WebPushService) {}
 
-  @Post("subscribe")
+  @Post("/subscriptions")
   async subscribe(
     @User() user: UserEntity,
-    @Body() subscription: PushSubscriptionDto,
+    @Body() subscription: CreatePushSubscriptionDto,
   ): Promise<{ success: boolean }> {
     await this.webPushService.subscribeUser(user.id, subscription);
     return { success: true };
   }
 
-  @Delete("unsubscribe")
+  @Delete("/subscriptions/:endpointHash")
   async unsubscribe(
     @User() user: UserEntity,
-    @Body() body: { endpoint: string },
+    @Param("endpointHash") endpointHash: string,
   ): Promise<{ success: boolean }> {
-    await this.webPushService.unsubscribeUser(user.id, body.endpoint);
+    await this.webPushService.unsubscribeUser(user.id, endpointHash);
     return { success: true };
   }
 }
