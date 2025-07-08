@@ -32,10 +32,10 @@ const countryOptions: { value: NewsApiCountry; label: string }[] = [
 ];
 
 export default function CountrySelect() {
-  const [selectedCountry, setSelectedCountry] = useState<string>("");
+  const [selectedCountry, setSelectedCountry] = useState<string | undefined>();
 
   const clearCountrySelection = () => {
-    setSelectedCountry("");
+    setSelectedCountry(void 0);
   };
 
   return (

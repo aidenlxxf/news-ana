@@ -29,10 +29,7 @@ export default function NewsArticlesList({
   return (
     <div className="space-y-4">
       {displayArticles.map((article, index) => (
-        <Card
-          key={article.source.id ?? article.url}
-          className="hover:shadow-md transition-shadow"
-        >
+        <Card key={article.url} className="hover:shadow-md transition-shadow">
           <CardContent className="p-4">
             <div className="flex gap-4">
               {/* Article image */}

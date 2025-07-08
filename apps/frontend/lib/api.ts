@@ -1,5 +1,6 @@
 import type {
   ApiErrorResponse,
+  CreatePushSubscriptionDtoType,
   CreateTaskDtoType,
   CreateTaskResponseDto,
   GetLatestResultResponseDto,
@@ -25,19 +26,33 @@ function createAuthHeader(): string {
 }
 
 // Generic API call function with error handling
-async function apiCall<T>(
+async function apiCall<Res>(
   endpoint: string,
-  options: RequestInit = {},
-): Promise<T> {
+  options?: RequestInit,
+): Promise<Res>;
+async function apiCall<Res, Req>(
+  endpoint: string,
+  options: Omit<RequestInit, "body"> & { jsonBody: Req },
+): Promise<Res>;
+async function apiCall<Res, Req = undefined>(
+  endpoint: string,
+  options: RequestInit & { jsonBody?: Req } = {},
+): Promise<Res> {
   const url = `${API_BASE_URL}${endpoint}`;
-  console.log("url", url);
+  const { jsonBody, body, ...rest } = options;
   const response = await fetch(url, {
-    ...options,
+    ...rest,
     headers: {
       Authorization: createAuthHeader(),
       "Content-Type": "application/json",
       ...options.headers,
     },
+    body:
+      "body" in options
+        ? body
+        : "jsonBody" in options
+          ? JSON.stringify(jsonBody)
+          : undefined,
   });
 
   if (!response.ok) {
@@ -53,7 +68,7 @@ async function apiCall<T>(
     throw new Error(errorMessage);
   }
 
-  return response.json();
+  return response.json() as Promise<Res>;
 }
 
 // API Functions
@@ -72,10 +87,13 @@ export async function listTasks(
 export async function createTask(
   taskData: CreateTaskDtoType,
 ): Promise<CreateTaskResponseDto> {
-  return apiCall<CreateTaskResponseDto>("/news-analysis/tasks", {
-    method: "POST",
-    body: JSON.stringify(taskData),
-  });
+  return apiCall<CreateTaskResponseDto, CreateTaskDtoType>(
+    "/news-analysis/tasks",
+    {
+      method: "POST",
+      jsonBody: taskData,
+    },
+  );
 }
 
 export async function getTask(taskId: string): Promise<GetTaskResponseDto> {
@@ -111,4 +129,30 @@ export async function getExecution(
   executionId: string,
 ): Promise<TaskExecution> {
   return apiCall<TaskExecution>(`/news-analysis/executions/${executionId}`);
+}
+
+// WebPush API Functions
+export async function subscribeWebPush(
+  subscription: CreatePushSubscriptionDtoType,
+): Promise<{ success: boolean }> {
+  return apiCall<{ success: boolean }, CreatePushSubscriptionDtoType>(
+    "/webpush/subscriptions",
+    {
+      method: "POST",
+      jsonBody: subscription,
+    },
+  );
+}
+
+export async function unsubscribeWebPush({
+  endpointHash,
+}: {
+  endpointHash: string;
+}): Promise<{ success: boolean }> {
+  return apiCall<{ success: boolean }>(
+    `/webpush/subscriptions/${endpointHash}`,
+    {
+      method: "DELETE",
+    },
+  );
 }

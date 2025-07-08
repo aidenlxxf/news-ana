@@ -183,6 +183,9 @@ importers:
       '@std/assert':
         specifier: npm:@jsr/std__assert@^1.0.13
         version: '@jsr/std__assert@1.0.13'
+      '@std/encoding':
+        specifier: npm:@jsr/std__encoding@^1.0.10
+        version: '@jsr/std__encoding@1.0.10'
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -195,6 +198,9 @@ importers:
       next:
         specifier: 15.3.4
         version: 15.3.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next-themes:
+        specifier: ^0.4.6
+        version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react:
         specifier: ^19.0.0
         version: 19.1.0
@@ -204,6 +210,9 @@ importers:
       react-hook-form:
         specifier: ^7.60.0
         version: 7.60.0(react@19.1.0)
+      sonner:
+        specifier: ^2.0.6
+        version: 2.0.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       tailwind-merge:
         specifier: ^3.3.1
         version: 3.3.1
@@ -1164,6 +1173,9 @@ packages:
 
   '@jsr/std__collections@1.1.2':
     resolution: {integrity: sha512-Fen3UrxGCxzra/QGhv6DNEKkzV6OCmWhN090iUF6Q4HRXYsSz9YoFnKci53QPXKnIlaBdha70QiSZDi127OKfQ==, tarball: https://npm.jsr.io/~/11/@jsr/std__collections/1.1.2.tgz}
+
+  '@jsr/std__encoding@1.0.10':
+    resolution: {integrity: sha512-WK2njnDTyKefroRNk2Ooq7GStp6Y0ccAvr4To+Z/zecRAGe7+OSvH9DbiaHpAKwEi2KQbmpWMOYsdNt+TsdmSw==, tarball: https://npm.jsr.io/~/11/@jsr/std__encoding/1.0.10.tgz}
 
   '@jsr/std__internal@1.0.9':
     resolution: {integrity: sha512-s+f4qrJzZgPAy7XuFOtgaSaxyPLnnEmAfXGLvRXGxPTL76URLVHkF+hOzqXz+bmk8/awybF6BRsasxtAQOV23Q==, tarball: https://npm.jsr.io/~/11/@jsr/std__internal/1.0.9.tgz}
@@ -3944,6 +3956,12 @@ packages:
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
+  next-themes@0.4.6:
+    resolution: {integrity: sha512-pZvgD5L0IEvX5/9GWyHMf3m8BKiVQwsCMHfoFosXtXBMnaS0ZnIJ9ST4b4NqLVKDEm8QBxoNNGNaBv2JNF6XNA==}
+    peerDependencies:
+      react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+
   next@15.3.4:
     resolution: {integrity: sha512-mHKd50C+mCjam/gcnwqL1T1vPx/XQNFlXqFIVdgQdVAFY9iIQtY0IfaVflEYzKiqjeA7B0cYYMaCrmAYFjs4rA==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
@@ -4488,6 +4506,12 @@ packages:
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
+
+  sonner@2.0.6:
+    resolution: {integrity: sha512-yHFhk8T/DK3YxjFQXIrcHT1rGEeTLliVzWbO0xN8GberVun2RiBnxAjXAYpZrqwEVHBG9asI/Li8TAAhN9m59Q==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+      react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
 
   sort-keys-length@1.0.1:
     resolution: {integrity: sha512-GRbEOUqCxemTAk/b32F2xa8wDTs+Z1QHOkbhJDQTvv/6G3ZkbJ+frYWsTcc7cBB3Fu4wy4XlLCuNtJuMn7Gsvw==}
@@ -6017,6 +6041,8 @@ snapshots:
       '@jsr/std__internal': 1.0.9
 
   '@jsr/std__collections@1.1.2': {}
+
+  '@jsr/std__encoding@1.0.10': {}
 
   '@jsr/std__internal@1.0.9': {}
 
@@ -8952,6 +8978,11 @@ snapshots:
 
   neo-async@2.6.2: {}
 
+  next-themes@0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+
   next@15.3.4(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
       '@next/env': 15.3.4
@@ -9494,6 +9525,11 @@ snapshots:
   sisteransi@1.0.5: {}
 
   slash@3.0.0: {}
+
+  sonner@2.0.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
 
   sort-keys-length@1.0.1:
     dependencies:

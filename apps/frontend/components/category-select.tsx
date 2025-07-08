@@ -25,10 +25,12 @@ const categoryOptions: { value: NewsApiCategory; label: string }[] = [
 ];
 
 export default function CategorySelect() {
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<
+    string | undefined
+  >();
 
   const clearCategorySelection = () => {
-    setSelectedCategory("");
+    setSelectedCategory(void 0);
   };
 
   return (

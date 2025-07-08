@@ -1,4 +1,8 @@
+"use client";
+
 import { Plus } from "lucide-react";
+import { useActionState, useEffect } from "react";
+import { toast } from "sonner";
 import { createTaskAction } from "@/app/actions";
 import CategorySelect from "@/components/category-select";
 import CountrySelect from "@/components/country-select";
@@ -6,8 +10,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Form from "next/form";
 
 export default function CreateTaskForm() {
+  const [state, formAction, isPending] = useActionState(createTaskAction, null);
+
+  // Handle successful task creation
+  useEffect(() => {
+    if (state?.success) {
+      toast.success(state.data?.message || "Task created successfully!");
+    }
+    if (state?.error) {
+      toast.error(state.error);
+    }
+  }, [state]);
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -18,7 +35,7 @@ export default function CreateTaskForm() {
       </CardHeader>
 
       <CardContent>
-        <form action={createTaskAction} className="space-y-4">
+        <Form action={formAction} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Country Selection */}
             <CountrySelect />
@@ -36,6 +53,7 @@ export default function CreateTaskForm() {
               type="text"
               placeholder="Enter keywords to search for..."
               className="w-full"
+              disabled={isPending}
             />
           </div>
 
@@ -49,11 +67,11 @@ export default function CreateTaskForm() {
           </div>
 
           {/* Submit Button */}
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" disabled={isPending}>
             <Plus className="h-4 w-4 mr-2" />
-            Create Task
+            {isPending ? "Creating Task..." : "Create Task"}
           </Button>
-        </form>
+        </Form>
       </CardContent>
     </Card>
   );
