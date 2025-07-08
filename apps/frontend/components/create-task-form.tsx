@@ -3,7 +3,7 @@
 import { Plus } from "lucide-react";
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
-import { createTaskAction } from "@/app/actions";
+import { createTaskAction } from "@/actions/task";
 import CategorySelect from "@/components/category-select";
 import CountrySelect from "@/components/country-select";
 import { Button } from "@/components/ui/button";

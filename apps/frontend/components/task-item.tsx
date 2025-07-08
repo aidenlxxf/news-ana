@@ -2,7 +2,7 @@ import type { ExecutionStatus, TaskSummary } from "@na/schema";
 import { assertNever } from "@std/assert/unstable-never";
 import { Eye, Globe, Search, Tag, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { deleteTaskAction } from "@/app/actions";
+import { deleteTaskAction } from "@/actions/task";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

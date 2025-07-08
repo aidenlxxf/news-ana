@@ -5,23 +5,7 @@ import { atom, useAtom } from "jotai";
 import { atomEffect } from "jotai-effect";
 import { isWebPushSupportedAtom } from "./web-push";
 
-// Backend API base URL
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_HOST || "http://localhost:3001";
-
-// Test credentials, will replace this with real user auth solution
-const AUTH_USERNAME = "test";
-const AUTH_PASSWORD = "password";
-
-// Create Basic Auth header
-function createAuthHeader(): string {
-  const credentials = Buffer.from(`${AUTH_USERNAME}:${AUTH_PASSWORD}`).toString(
-    "base64",
-  );
-  return `Basic ${credentials}`;
-}
-
-export const isSSESupportedAtom = atom(
+export const isSseSupportedAtom = atom(
   () =>
     typeof window !== "undefined" && // only enable in browser
     typeof EventSource !== "undefined" &&
@@ -29,19 +13,36 @@ export const isSSESupportedAtom = atom(
     typeof fetch !== "undefined",
 );
 
-export const isSSEConnectedActiveAtom = atom(false);
+export const isSseConnectedActiveAtom = atom(false);
+
+const connResetMarkerAtom = atom(false);
+export const resetSseConnAtom = atom(null, (_, set) => {
+  set(connResetMarkerAtom, (v) => !!v);
+});
+
+class FatalError extends Error {}
 
 export const sseConnectionAtom = atomEffect((get, set) => {
-  if (!get(isSSESupportedAtom) || get(isWebPushSupportedAtom)) return;
+  if (
+    !get(isSseSupportedAtom) ||
+    get(isWebPushSupportedAtom) ||
+    get(connResetMarkerAtom)
+  )
+    return;
   const ac = new AbortController();
-  fetchEventSource(`${API_BASE_URL}/notifications/sse`, {
+  fetchEventSource("/notifications/sse", {
     signal: ac.signal,
+    credentials: "include", // Use cookies for JWT authentication
     headers: {
-      Authorization: createAuthHeader(),
+      "Content-Type": "application/json",
     },
     onopen: async (response) => {
-      if (!response.ok) return;
-      set(isSSEConnectedActiveAtom, true);
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new FatalError("Unauthorized");
+        }
+      }
+      set(isSseConnectedActiveAtom, true);
       console.debug("SSE connection opened");
     },
     onmessage: (event) => {
@@ -63,6 +64,10 @@ export const sseConnectionAtom = atomEffect((get, set) => {
     },
     onerror: (error) => {
       console.error("SSE connection error:", error);
+      // stop retrying if fatal error
+      if (error instanceof FatalError) {
+        throw error;
+      }
     },
     onclose: () => {
       console.log("SSE connection closed");

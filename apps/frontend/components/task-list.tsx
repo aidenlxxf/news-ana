@@ -1,4 +1,3 @@
-import type { TaskSummary } from "@na/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { listTasks } from "@/lib/api";
 import TaskItem from "./task-item";
@@ -12,29 +11,8 @@ export default async function TaskList({
   limit = 20,
   offset = 0,
 }: TaskListProps) {
-  let tasks: TaskSummary[] = [];
-  let error: string | null = null;
-
-  try {
-    const response = await listTasks(limit, offset);
-    tasks = response.tasks;
-  } catch (err) {
-    error = err instanceof Error ? err.message : "Failed to load tasks";
-    console.error("Failed to fetch tasks:", err);
-  }
-
-  if (error) {
-    return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="text-red-600">Error Loading Tasks</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-red-500">{error}</p>
-        </CardContent>
-      </Card>
-    );
-  }
+  const response = await listTasks(limit, offset);
+  const tasks = response.tasks;
 
   if (tasks.length === 0) {
     return (

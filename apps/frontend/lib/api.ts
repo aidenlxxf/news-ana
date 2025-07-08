@@ -1,51 +1,51 @@
 import type {
   ApiErrorResponse,
+  AuthResponseDto,
   CreatePushSubscriptionDtoType,
   CreateTaskDtoType,
   CreateTaskResponseDto,
   GetLatestResultResponseDto,
   GetTaskResponseDto,
   ListTasksResponseDto,
+  LoginDto,
   RefreshTaskResponseDto,
+  RegisterDto,
   TaskExecution,
+  UserProfileDto,
 } from "@na/schema";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-// Backend API base URL - assuming backend runs on port 3001
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_HOST || "http://localhost:3001";
-
-// Test credentials
-const AUTH_USERNAME = "test";
-const AUTH_PASSWORD = "password";
-
-// Create Basic Auth header
-function createAuthHeader(): string {
-  const credentials = Buffer.from(`${AUTH_USERNAME}:${AUTH_PASSWORD}`).toString(
-    "base64",
-  );
-  return `Basic ${credentials}`;
-}
+// Backend API base URL
+const API_BASE_URL = process.env.BACKEND_HOST || "http://localhost:3001";
 
 // Generic API call function with error handling
 async function apiCall<Res>(
   endpoint: string,
-  options?: RequestInit,
+  options?: RequestInit & { no401Redirect?: boolean },
 ): Promise<Res>;
 async function apiCall<Res, Req>(
   endpoint: string,
-  options: Omit<RequestInit, "body"> & { jsonBody: Req },
+  options: Omit<RequestInit, "body"> & {
+    jsonBody: Req;
+    no401Redirect?: boolean;
+  },
 ): Promise<Res>;
 async function apiCall<Res, Req = undefined>(
   endpoint: string,
-  options: RequestInit & { jsonBody?: Req } = {},
+  options: RequestInit & { jsonBody?: Req; no401Redirect?: boolean } = {},
 ): Promise<Res> {
   const url = `${API_BASE_URL}${endpoint}`;
-  const { jsonBody, body, ...rest } = options;
+  const { jsonBody, body, no401Redirect, ...rest } = options;
+  const authCookie = (await cookies()).get(
+    process.env.AUTH_COOKIE_NAME || "auth_token",
+  );
   const response = await fetch(url, {
     ...rest,
+    credentials: "include", // Include cookies for JWT authentication
     headers: {
-      Authorization: createAuthHeader(),
-      "Content-Type": "application/json",
+      ...(authCookie ? { Authorization: `Bearer ${authCookie.value}` } : {}),
+      ...(jsonBody ? { "Content-Type": "application/json" } : {}),
       ...options.headers,
     },
     body:
@@ -55,6 +55,10 @@ async function apiCall<Res, Req = undefined>(
           ? JSON.stringify(jsonBody)
           : undefined,
   });
+
+  if (response.status === 401 && !no401Redirect) {
+    redirect("/login");
+  }
 
   if (!response.ok) {
     let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
@@ -137,7 +141,7 @@ export async function subscribeWebPush(
   subscription: CreatePushSubscriptionDtoType,
 ): Promise<{ success: boolean }> {
   return apiCall<{ success: boolean }, CreatePushSubscriptionDtoType>(
-    "/notifications/subscribe",
+    "/notifications/subscriptions",
     {
       method: "POST",
       jsonBody: subscription,
@@ -151,9 +155,55 @@ export async function unsubscribeWebPush({
   endpointHash: string;
 }): Promise<{ success: boolean }> {
   return apiCall<{ success: boolean }>(
-    `/notifications/subscribe/${endpointHash}`,
+    `/notifications/subscriptions/${endpointHash}`,
     {
       method: "DELETE",
     },
   );
+}
+
+export async function getUserProfile(token: string): Promise<UserProfileDto> {
+  return apiCall<UserProfileDto>("/auth/profile", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+// Authentication API Functions
+export async function login(
+  username: string,
+  password: string,
+): Promise<AuthResponseDto> {
+  const resp = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password } satisfies LoginDto),
+  });
+  if (!resp.ok) {
+    const errorData: ApiErrorResponse = await resp.json();
+    throw new Error(errorData.message);
+  }
+  return (await resp.json()) as AuthResponseDto;
+}
+
+export async function register(
+  username: string,
+  password: string,
+): Promise<AuthResponseDto> {
+  const resp = await fetch(`${API_BASE_URL}/auth/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password } satisfies RegisterDto),
+  });
+  if (!resp.ok) {
+    const errorData: ApiErrorResponse = await resp.json();
+    throw new Error(errorData.message);
+  }
+  return (await resp.json()) as AuthResponseDto;
 }

@@ -1,5 +1,5 @@
 import { Trash2 } from "lucide-react";
-import { deleteTaskAction } from "@/app/actions";
+import { deleteTaskAction } from "@/actions/task";
 import { Button } from "@/components/ui/button";
 
 interface TaskActionsProps {

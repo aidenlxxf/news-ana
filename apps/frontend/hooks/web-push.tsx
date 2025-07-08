@@ -1,4 +1,7 @@
-import { subscribeUserAction, unsubscribeUserAction } from "@/app/actions";
+import {
+  subscribeUserAction,
+  unsubscribeUserAction,
+} from "@/actions/live-update";
 import { sha256Hash, urlBase64ToUint8Array } from "@/lib/encoding";
 import { atom, useAtom, useStore } from "jotai";
 import { atomWithRefresh, loadable } from "jotai/utils";

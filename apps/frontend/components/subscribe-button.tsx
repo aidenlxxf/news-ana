@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { Activity, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAtomValue } from "jotai";
-import { isSSEConnectedActiveAtom, isSSESupportedAtom } from "@/hooks/sse-push";
+import { isSseConnectedActiveAtom, isSseSupportedAtom } from "@/hooks/sse-push";
 import {
   isWebPushSupportedAtom,
   pushSubscriptionAtom,
@@ -13,7 +13,7 @@ import {
 } from "@/hooks/web-push";
 
 export default function NotificationButton() {
-  const isSSESupported = useAtomValue(isSSESupportedAtom);
+  const isSSESupported = useAtomValue(isSseSupportedAtom);
   const isWebPushSupported = useAtomValue(isWebPushSupportedAtom);
 
   if (isWebPushSupported) {
@@ -32,7 +32,7 @@ export default function NotificationButton() {
 }
 
 function SSEButton() {
-  const isSSEConnectedActive = useAtomValue(isSSEConnectedActiveAtom);
+  const isSSEConnectedActive = useAtomValue(isSseConnectedActiveAtom);
   if (isSSEConnectedActive) {
     return (
       <Button disabled>

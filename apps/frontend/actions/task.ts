@@ -1,18 +1,9 @@
 "use server";
 
-import {
-  type CreatePushSubscriptionDtoType,
-  CreateTaskSchema,
-} from "@na/schema";
+import { CreateTaskSchema } from "@na/schema";
 import { revalidatePath } from "next/cache";
 import * as v from "valibot";
-import {
-  createTask,
-  deleteTask,
-  refreshTask,
-  subscribeWebPush,
-  unsubscribeWebPush,
-} from "@/lib/api";
+import { createTask, deleteTask, refreshTask } from "@/lib/api";
 import type { CreateTaskActionState } from "@/types/frontend";
 
 // Server Action for creating a new task
@@ -38,7 +29,8 @@ export async function createTaskAction(
       data: {
         taskId: response.taskId,
         message: response.message,
-        type: "success",
+        status: "success",
+        type: "task",
       },
     };
   } catch (error) {
@@ -76,31 +68,5 @@ export async function refreshTaskAction(taskId: string) {
     revalidatePath(`/tasks/${taskId}`);
   } catch (error) {
     console.error("Failed to refresh task:", error);
-  }
-}
-
-// Server Action for subscribing to web push notifications
-export async function subscribeUserAction(
-  subscription: CreatePushSubscriptionDtoType,
-) {
-  try {
-    await subscribeWebPush(subscription);
-  } catch (error) {
-    console.error("Failed to subscribe to push notifications:", error);
-    throw error;
-  }
-}
-
-// Server Action for unsubscribing from web push notifications
-export async function unsubscribeUserAction({
-  endpointHash,
-}: {
-  endpointHash: string;
-}) {
-  try {
-    await unsubscribeWebPush({ endpointHash });
-  } catch (error) {
-    console.error("Failed to unsubscribe from push notifications:", error);
-    throw error;
   }
 }

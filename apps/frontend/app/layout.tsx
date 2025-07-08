@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import ServiceWorkerHandler from "@/components/sw-handler";
 import { Toaster } from "@/components/ui/sonner";
-import "./globals.css";
 import { Provider } from "jotai";
+
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     "Manage your news analysis tasks and monitor their execution status",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -33,7 +33,6 @@ export default function RootLayout({
       >
         <Provider>
           {children}
-          <ServiceWorkerHandler />
           <Toaster />
         </Provider>
       </body>

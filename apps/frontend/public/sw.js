@@ -2,8 +2,10 @@
 /// <reference lib="webworker" />
 
 ((/** @type {ServiceWorkerGlobalScope} */ self) => {
+  self.addEventListener("install", () => {
+    self.skipWaiting();
+  });
   self.addEventListener("push", async (event) => {
-    console.log("push", event.data);
     if (!event.data) return;
 
     /** @type {import("@na/schema").TaskNotificationDto} */
