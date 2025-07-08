@@ -3,14 +3,14 @@ import {
   NewsApiCategorySchema,
   NewsApiCountrySchema,
 } from "../news-analysis/task-parameters.schema.js";
-import { formInteger } from "../utils/form-helpers.js";
+import { formNullish, formInteger } from "../utils/form-helpers.js";
 
 // Create Task Schema
 export const CreateTaskSchema = v.pipe(
   v.object({
-    country: v.nullish(NewsApiCountrySchema, null),
-    category: v.nullish(NewsApiCategorySchema, null),
-    query: v.nullish(v.string(), null),
+    country: formNullish(NewsApiCountrySchema),
+    category: formNullish(NewsApiCategorySchema),
+    query: formNullish(v.string()),
   }),
   v.check(
     (params) => !!(params.category || params.country || params.query),
