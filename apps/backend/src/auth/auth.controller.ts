@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Post,
   UseGuards,
+  UnauthorizedException,
 } from "@nestjs/common";
 import { User as UserEntity } from "@prisma/client";
 import { AuthService } from "./auth.service";
@@ -16,10 +17,8 @@ import {
   UserProfileDto,
 } from "./dto/auth.dto";
 
-import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { User } from "./user.decorator";
-import { ValidationPipe } from "@/validators/valibot.pipe";
 
 @Controller("auth")
 export class AuthController {
@@ -27,16 +26,22 @@ export class AuthController {
 
   @Post("login")
   @HttpCode(HttpStatus.OK)
-  @UseGuards(LocalAuthGuard)
-  async login(@User() user: UserEntity): Promise<AuthResponseDto> {
+  async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
+    const user = await this.authService.validateUser(
+      loginDto.data.username,
+      loginDto.data.password,
+    );
+
+    if (!user) {
+      throw new UnauthorizedException("Invalid credentials");
+    }
+
     return this.authService.login(user);
   }
 
   @Post("register")
   @HttpCode(HttpStatus.CREATED)
-  async register(
-    @Body(ValidationPipe) registerDto: RegisterDto,
-  ): Promise<AuthResponseDto> {
+  async register(@Body() registerDto: RegisterDto): Promise<AuthResponseDto> {
     return this.authService.register(registerDto.data);
   }
 
