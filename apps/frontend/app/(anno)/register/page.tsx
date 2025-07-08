@@ -41,6 +41,7 @@ export default function RegisterForm() {
               maxLength={20}
               pattern="^[a-zA-Z0-9_]+$"
               title="Username can only contain letters, numbers, and underscores"
+              autoComplete="username"
             />
           </div>
 
@@ -55,6 +56,7 @@ export default function RegisterForm() {
               minLength={6}
               pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$"
               title="Password must contain at least one uppercase letter, one lowercase letter, and one number"
+              autoComplete="new-password"
             />
           </div>
 
@@ -66,6 +68,7 @@ export default function RegisterForm() {
               type="password"
               placeholder="Confirm your password"
               required
+              autoComplete="new-password"
             />
           </div>
 

@@ -36,6 +36,7 @@ export default function LoginForm() {
               placeholder="Enter your username"
               required
               minLength={3}
+              autoComplete="username"
             />
           </div>
 
@@ -48,6 +49,7 @@ export default function LoginForm() {
               placeholder="Enter your password"
               required
               minLength={6}
+              autoComplete="current-password"
             />
           </div>
 
