@@ -58,6 +58,6 @@ export const CreatePushSubscriptionSchema = v.object({
   }),
 });
 
-export type CreatePushSubscriptionDtoType = v.InferOutput<
+export type CreatePushSubscriptionDtoType = v.InferInput<
   typeof CreatePushSubscriptionSchema
 >;

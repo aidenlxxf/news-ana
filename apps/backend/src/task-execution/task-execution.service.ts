@@ -3,13 +3,12 @@ import { forwardRef, Inject, Injectable, Logger } from "@nestjs/common";
 import {
   ExecutionStatus,
   type Prisma,
-  PushSubscription,
   Task,
   TaskExecution,
   User,
 } from "@prisma/client";
 import { PrismaService } from "@/prisma.service";
-import { WebPushService } from "@/webpush/webpush.service";
+import { NotificationService } from "@/notification/notification.service";
 
 @Injectable()
 export class TaskExecutionService {
@@ -17,8 +16,8 @@ export class TaskExecutionService {
 
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(forwardRef(() => WebPushService))
-    private readonly webPushService?: WebPushService,
+    @Inject(forwardRef(() => NotificationService))
+    private readonly notificationService?: NotificationService,
   ) {}
 
   async createExecution(taskId: string): Promise<TaskExecution> {
@@ -44,7 +43,7 @@ export class TaskExecutionService {
       where: { id: executionId },
       data: { status, ...data },
       include: {
-        task: { include: { user: { include: { pushSubscriptions: true } } } },
+        task: { include: { user: true } },
       },
     });
 
@@ -54,18 +53,16 @@ export class TaskExecutionService {
       status === ExecutionStatus.COMPLETED ||
       status === ExecutionStatus.FAILED
     ) {
-      await this.sendPushNotification(execution, status);
+      await this.sendNotification(execution, status);
     }
 
     return execution;
   }
 
-  private async sendPushNotification(
+  private async sendNotification(
     execution: TaskExecution & {
       task: Task & {
-        user: User & {
-          pushSubscriptions: PushSubscription[];
-        };
+        user: User;
       };
     },
     status: ExecutionStatus,
@@ -73,22 +70,24 @@ export class TaskExecutionService {
     const message = this.buildNotificationMessage(execution, status);
 
     this.logger.log(
-      `Sending push notification for execution ${execution.id}: ${message}`,
+      `Sending notification for execution ${execution.id}: ${message}`,
     );
 
-    if (this.webPushService) {
+    if (this.notificationService) {
       const notification: TaskNotificationDto = {
         taskId: execution.taskId,
         message,
-        type: status === ExecutionStatus.COMPLETED ? "success" : "error",
+        status: status === ExecutionStatus.COMPLETED ? "success" : "error",
+        type: "task",
       };
 
-      for (const subscription of execution.task.user.pushSubscriptions) {
-        await this.webPushService.sendNotification(subscription, notification);
-      }
+      await this.notificationService.sendNotification(
+        execution.task.user.id,
+        notification,
+      );
     } else {
       this.logger.warn(
-        "WebPushService not available, skipping push notifications",
+        "NotificationService not available, skipping notifications",
       );
     }
   }

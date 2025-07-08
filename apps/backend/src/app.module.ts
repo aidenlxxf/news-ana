@@ -5,9 +5,9 @@ import { APP_FILTER } from "@nestjs/core";
 import { AuthModule } from "./auth/auth.module";
 import { AllExceptionsFilter } from "./filters/http-exception.filter";
 import { NewsAnalysisModule } from "./news-analysis/news-analysis.module";
+import { NotificationModule } from "./notification/notification.module";
 import { PrismaService } from "./prisma.service";
 import { TaskExecutionModule } from "./task-execution/task-execution.module";
-import { WebPushModule } from "./webpush/webpush.module";
 
 @Module({
   imports: [
@@ -25,7 +25,7 @@ import { WebPushModule } from "./webpush/webpush.module";
     }),
     AuthModule,
     TaskExecutionModule,
-    WebPushModule,
+    NotificationModule,
     NewsAnalysisModule,
   ],
   controllers: [],

@@ -67,7 +67,8 @@ export interface TaskExecution {
 export interface TaskNotificationDto {
   taskId: string;
   message: string;
-  type: "success" | "error";
+  status: "success" | "error";
+  type: "task";
 }
 
 // Get Latest Result Response
