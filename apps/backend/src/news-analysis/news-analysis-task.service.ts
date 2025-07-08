@@ -1,4 +1,8 @@
-import { TaskParametersV1, TaskParametersV1Schema } from "@na/schema";
+import {
+  TaskExecution,
+  TaskParametersV1,
+  TaskParametersV1Schema,
+} from "@na/schema";
 import { InjectQueue } from "@nestjs/bullmq";
 import {
   ConflictException,
@@ -301,6 +305,39 @@ export class NewsAnalysisTaskService {
           }
         : undefined,
       hasResult: !!latestExecution,
+    };
+  }
+
+  async getExecution(
+    executionId: string,
+    userId: string,
+  ): Promise<TaskExecution> {
+    const execution = await this.prisma.taskExecution.findFirst({
+      where: {
+        id: executionId,
+        task: { userId },
+      },
+      select: {
+        id: true,
+        status: true,
+        startedAt: true,
+        completedAt: true,
+        result: true,
+        errorMessage: true,
+      },
+    });
+
+    if (!execution) {
+      throw new NotFoundException("Execution not found");
+    }
+
+    return {
+      id: execution.id,
+      status: execution.status,
+      startedAt: execution.startedAt?.toISOString(),
+      completedAt: execution.completedAt?.toISOString(),
+      result: execution.result,
+      errorMessage: execution.errorMessage ?? undefined,
     };
   }
 }

@@ -1,3 +1,4 @@
+import { type TaskExecution } from "@na/schema";
 import {
   Body,
   Controller,
@@ -94,5 +95,13 @@ export class NewsAnalysisController {
     @User() user: UserEntity,
   ): Promise<GetLatestResultResponseDto> {
     return this.newsAnalysisService.getLatestResult(id, user.id);
+  }
+
+  @Get("executions/:id")
+  async getExecution(
+    @Param("id") id: string,
+    @User() user: UserEntity,
+  ): Promise<TaskExecution> {
+    return this.newsAnalysisService.getExecution(id, user.id);
   }
 }
