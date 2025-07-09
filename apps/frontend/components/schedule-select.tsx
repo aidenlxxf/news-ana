@@ -69,7 +69,7 @@ export default function ScheduleSelect({
           <Clock className="h-4 w-4" />
           Schedule Frequency
         </Label>
-
+        <input type="hidden" name={SCHEDULE_FIELDS.timezone} value={timezone} />
         <div className="flex flex-col items-start sm:flex-row gap-4">
           {/* Schedule Type Selection */}
           <Select
@@ -105,11 +105,6 @@ export default function ScheduleSelect({
                 value={scheduleTime}
                 onChange={(e) => setScheduleTime(e.target.value)}
                 className="w-auto"
-              />
-              <input
-                type="hidden"
-                name={SCHEDULE_FIELDS.timezone}
-                value={timezone}
               />
             </div>
           )}
