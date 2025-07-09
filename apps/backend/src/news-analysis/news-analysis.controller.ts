@@ -8,6 +8,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
 } from "@nestjs/common";
@@ -19,6 +20,10 @@ import {
   CreateTaskDto,
   type CreateTaskResponseDto,
 } from "./dto/create-task.dto";
+import {
+  UpdateTaskDto,
+  type UpdateTaskResponseDto,
+} from "./dto/update-task.dto";
 import { type GetLatestResultResponseDto } from "./dto/get-latest-result.dto";
 import { type GetTaskResponseDto } from "./dto/get-task.dto";
 import {
@@ -103,5 +108,15 @@ export class NewsAnalysisController {
     @User() user: UserEntity,
   ): Promise<TaskExecution> {
     return this.newsAnalysisService.getExecution(id, user.id);
+  }
+
+  @Put("tasks/:id")
+  @HttpCode(HttpStatus.OK)
+  async updateTask(
+    @Param("id") id: string,
+    @Body() updateTaskDto: UpdateTaskDto,
+    @User() user: UserEntity,
+  ): Promise<UpdateTaskResponseDto> {
+    return this.newsAnalysisService.updateTask(id, updateTaskDto.data, user.id);
   }
 }

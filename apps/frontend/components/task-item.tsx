@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import TaskResultSummary from "./task-result-summary";
+import Form from "next/form";
 
 interface TaskItemProps {
   task: TaskSummary;
@@ -132,7 +133,8 @@ export default function TaskItem({ task }: TaskItemProps) {
             </Link>
           </Button>
 
-          <form action={deleteTaskAction.bind(null, task.id)}>
+          <Form action={deleteTaskAction}>
+            <input type="hidden" name="task-id" value={task.id} />
             <Button
               type="submit"
               variant="destructive"
@@ -142,7 +144,7 @@ export default function TaskItem({ task }: TaskItemProps) {
               <Trash2 className="h-3 w-3" />
               Delete
             </Button>
-          </form>
+          </Form>
         </div>
       </CardContent>
     </Card>

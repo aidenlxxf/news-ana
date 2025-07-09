@@ -11,10 +11,12 @@ import type {
   RefreshTaskResponseDto,
   RegisterDto,
   TaskExecution,
+  UpdateTaskDtoType,
+  UpdateTaskResponseDto,
   UserProfileDto,
 } from "@na/schema";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 // Backend API base URL
 const API_BASE_URL = process.env.BACKEND_HOST || "http://localhost:3001";
@@ -59,6 +61,9 @@ async function apiCall<Res, Req = undefined>(
   if (response.status === 401 && !no401Redirect) {
     redirect("/login");
   }
+  if (response.status === 404) {
+    notFound();
+  }
 
   if (!response.ok) {
     let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
@@ -96,6 +101,19 @@ export async function createTask(
     "/news-analysis/tasks",
     {
       method: "POST",
+      jsonBody: taskData,
+    },
+  );
+}
+
+export async function updateTask(
+  taskId: string,
+  taskData: UpdateTaskDtoType,
+): Promise<UpdateTaskResponseDto> {
+  return apiCall<UpdateTaskResponseDto, UpdateTaskDtoType>(
+    `/news-analysis/tasks/${taskId}`,
+    {
+      method: "PUT",
       jsonBody: taskData,
     },
   );

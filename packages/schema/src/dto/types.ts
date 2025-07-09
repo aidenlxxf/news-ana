@@ -33,6 +33,11 @@ export interface CreateTaskResponseDto {
   message: string;
 }
 
+export interface UpdateTaskResponseDto {
+  taskId: string;
+  message: string;
+}
+
 export interface ListTasksResponseDto {
   tasks: TaskSummary[];
   limit: number;

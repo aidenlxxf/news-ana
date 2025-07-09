@@ -1,10 +1,14 @@
 "use server";
 
-import { CreateTaskSchema } from "@na/schema";
+import { CreateTaskSchema, UpdateTaskSchema } from "@na/schema";
 import { revalidatePath } from "next/cache";
 import * as v from "valibot";
-import { createTask, deleteTask, refreshTask } from "@/lib/api";
-import type { CreateTaskActionState } from "@/types/frontend";
+import { createTask, deleteTask, refreshTask, updateTask } from "@/lib/api";
+import type {
+  CreateTaskActionState,
+  UpdateTaskActionState,
+} from "@/types/frontend";
+import { handleNextRedirect } from "@/lib/next";
 
 // Server Action for creating a new task
 export async function createTaskAction(
@@ -46,16 +50,21 @@ export async function createTaskAction(
 }
 
 // Server Action for deleting a task
-export async function deleteTaskAction(taskId: string) {
+export async function deleteTaskAction(formData: FormData): Promise<void> {
   try {
+    const taskId = formData.get("task-id");
+    if (typeof taskId !== "string") throw new Error("Task ID is required");
     await deleteTask(taskId);
 
     // Revalidate the page to remove the deleted task
     revalidatePath("/");
     revalidatePath(`/tasks/${taskId}`);
+    revalidatePath(`/tasks/${taskId}/edit`);
   } catch (error) {
     console.error("Failed to delete task:", error);
+    return;
   }
+  handleNextRedirect(formData);
 }
 
 // Server Action for refreshing a task
@@ -69,4 +78,38 @@ export async function refreshTaskAction(taskId: string) {
   } catch (error) {
     console.error("Failed to refresh task:", error);
   }
+}
+
+// Server Action for updating a task
+export async function updateTaskAction(
+  _prevState: UpdateTaskActionState | undefined,
+  formData: FormData,
+): Promise<UpdateTaskActionState | undefined> {
+  try {
+    const taskData = v.parse(UpdateTaskSchema, {
+      country: formData.get("country"),
+      category: formData.get("category"),
+      query: formData.get("query"),
+    });
+    const taskId = formData.get("task-id");
+    if (typeof taskId !== "string" || !taskId)
+      throw new Error("Task ID is required");
+
+    await updateTask(taskId, taskData);
+
+    // Revalidate the page to show the updated task
+    revalidatePath("/");
+    revalidatePath(`/tasks/${taskId}`);
+    revalidatePath(`/tasks/${taskId}/edit`);
+  } catch (error) {
+    console.error("Failed to update task:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to update task";
+
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+  handleNextRedirect(formData);
 }

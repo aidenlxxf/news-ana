@@ -21,6 +21,7 @@ import { GetTaskResponseDto } from "./dto/get-task.dto";
 import { ListTasksResponseDto } from "./dto/list-task.dto";
 import { ListTaskExecutionsResponseDto } from "./dto/list-task-executions.dto";
 import { RefreshTaskResponseDto } from "./dto/refresh-task.dto";
+import { UpdateTaskResponseDto } from "./dto/update-task.dto";
 import { type TaskSchedulerQueue } from "./task-scheduler.worker";
 
 @Injectable()
@@ -32,15 +33,17 @@ export class NewsAnalysisTaskService {
   ) {}
 
   private async scheduleTask(taskId: string) {
+    const schedulerId = generateSchedulerId(taskId);
+    const existing = await this.taskSchedulerQueue.getJobScheduler(schedulerId);
+    if (existing) {
+      // ask scheduler to run immediately
+      await this.taskSchedulerQueue.add(`task-scheduler:${taskId}`, { taskId });
+      return;
+    }
     return await this.taskSchedulerQueue.upsertJobScheduler(
-      generateSchedulerId(taskId),
-      {
-        every: 1000 * 60 * 60,
-      },
-      {
-        name: `task-scheduler:${taskId}`,
-        data: { taskId },
-      },
+      schedulerId,
+      { pattern: "0 0 * * *", immediately: true },
+      { name: `task-scheduler:${taskId}`, data: { taskId } },
     );
   }
 
@@ -350,6 +353,79 @@ export class NewsAnalysisTaskService {
       completedAt: execution.completedAt?.toISOString(),
       result: execution.result,
       errorMessage: execution.errorMessage ?? undefined,
+    };
+  }
+
+  async updateTask(
+    taskId: string,
+    {
+      country,
+      category,
+      query,
+    }: Pick<TaskParametersV1, "country" | "category" | "query">,
+    userId: string,
+  ): Promise<UpdateTaskResponseDto> {
+    // First verify the task belongs to the user
+    const existingTask = await this.prisma.task.findFirst({
+      where: { id: taskId, userId },
+    });
+
+    if (!existingTask) {
+      throw new NotFoundException("Task not found");
+    }
+
+    const parameters = v.parse(TaskParametersV1Schema, {
+      country,
+      category,
+      query,
+      version: "news-fetch:v1",
+    });
+
+    const newParamsHash = generateParamsHash(country, category, query);
+
+    if (newParamsHash === existingTask.paramsHash) {
+      return {
+        taskId,
+        message: "Task not changed",
+      };
+    }
+
+    // Update the task
+    const updatedTask = await this.prisma.$transaction(async (tx) => {
+      // Check if the new parameters would conflict with another task
+      const conflictingTask = await this.prisma.task.findUnique({
+        where: { userId_paramsHash: { userId, paramsHash: newParamsHash } },
+        select: { id: true },
+      });
+
+      if (conflictingTask) {
+        throw new ConflictException({
+          message: "Task with same parameters already exists",
+          statusCode: 409,
+          data: { taskId: conflictingTask.id },
+        } satisfies ApiErrorResponse<{ taskId: string }>);
+      }
+
+      const task = await tx.task.update({
+        where: { id: taskId },
+        data: {
+          parameters,
+          paramsHash: newParamsHash,
+          updatedAt: new Date(),
+          executions: {
+            // clear all previous execution results
+            deleteMany: {},
+          },
+        },
+      });
+
+      return task;
+    });
+    await this.scheduleTask(taskId);
+
+    return {
+      taskId: updatedTask.id,
+      message: "Task updated successfully",
     };
   }
 }

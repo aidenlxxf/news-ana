@@ -7,6 +7,12 @@ export interface CreateTaskActionState {
   error?: string;
 }
 
+export interface UpdateTaskActionState {
+  success: boolean;
+  data?: TaskNotificationDto;
+  error?: string;
+}
+
 // Service Worker Message Types
 export interface NewsUpdateMessage {
   type: "news-update";

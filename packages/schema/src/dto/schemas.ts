@@ -21,6 +21,22 @@ export const CreateTaskSchema = v.pipe(
 
 export type CreateTaskDtoType = v.InferOutput<typeof CreateTaskSchema>;
 
+// Update Task Schema
+export const UpdateTaskSchema = v.pipe(
+  v.object({
+    country: formNullish(NewsApiCountrySchema),
+    category: formNullish(NewsApiCategorySchema),
+    query: formNullish(v.string()),
+  }),
+  v.check(
+    (params) => !!(params.category || params.country || params.query),
+    "at least one of country, category, or query must be provided",
+  ),
+  v.brand("UpdateTaskSchema"),
+);
+
+export type UpdateTaskDtoType = v.InferOutput<typeof UpdateTaskSchema>;
+
 // List Tasks Query Schema
 export const ListTasksQuerySchema = v.object({
   limit: v.pipe(formInteger(20), v.minValue(1)),

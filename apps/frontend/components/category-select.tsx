@@ -24,10 +24,14 @@ const categoryOptions: { value: NewsApiCategory; label: string }[] = [
   { value: "technology", label: "Technology" },
 ];
 
-export default function CategorySelect() {
-  const [selectedCategory, setSelectedCategory] = useState<
-    string | undefined
-  >();
+interface CategorySelectProps {
+  defaultValue?: string;
+}
+
+export default function CategorySelect({ defaultValue }: CategorySelectProps) {
+  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
+    defaultValue,
+  );
 
   const clearCategorySelection = () => {
     setSelectedCategory(void 0);

@@ -31,8 +31,14 @@ const countryOptions: { value: NewsApiCountry; label: string }[] = [
   { value: "mx", label: "Mexico" },
 ];
 
-export default function CountrySelect() {
-  const [selectedCountry, setSelectedCountry] = useState<string | undefined>();
+interface CountrySelectProps {
+  defaultValue?: string;
+}
+
+export default function CountrySelect({ defaultValue }: CountrySelectProps) {
+  const [selectedCountry, setSelectedCountry] = useState<string | undefined>(
+    defaultValue,
+  );
 
   const clearCountrySelection = () => {
     setSelectedCountry(void 0);
