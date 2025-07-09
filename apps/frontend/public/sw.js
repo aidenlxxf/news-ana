@@ -44,12 +44,16 @@
       return pathname === "/" || pathname === `/tasks/${data.taskId}`;
     });
 
+    // Always send message to clients for page refresh
     for (const client of taskRelatedClients) {
-      /** @type {import("../types/frontend").NewsUpdateMessage} */
-      const message = { type: "news-update", payload: data };
+      /** @type {import("../types/frontend").TaskWebPushMessage} */
+      const message = { type: "task-web-push", payload: data };
       client.postMessage(message);
     }
+
+    // Only show notification if pushType is "notification" and no visible clients
     if (
+      data.pushType === "notification" &&
       taskRelatedClients.every((client) => client.visibilityState !== "visible")
     ) {
       await self.registration.showNotification(

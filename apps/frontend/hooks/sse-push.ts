@@ -1,4 +1,4 @@
-import { NewsUpdateEvent } from "@/types/frontend";
+import { TaskNotificationEvent } from "@/types/frontend";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 import type { TaskNotificationDto } from "@na/schema";
 import { atom, useAtom } from "jotai";
@@ -51,7 +51,7 @@ export const sseConnectionAtom = atomEffect((get, set) => {
           console.debug("SSE message received:", event.data);
           // need routing logic if support more notification types
           const notification: TaskNotificationDto = JSON.parse(event.data);
-          window.dispatchEvent(new NewsUpdateEvent(notification));
+          window.dispatchEvent(new TaskNotificationEvent(notification));
         } else if (event.event === "heartbeat") {
           // Handle heartbeat - just log for debugging
           console.debug("SSE heartbeat received");

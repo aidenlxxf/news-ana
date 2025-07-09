@@ -4,8 +4,9 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useServiceWorker } from "@/hooks/web-push";
 import { useSSEConnection } from "@/hooks/sse-push";
-import type { NewsUpdateEvent } from "@/types/frontend";
+import type { TaskNotificationEvent } from "@/types/frontend";
 import { toast } from "sonner";
+import { assertNever } from "@std/assert/unstable-never";
 
 export default function ServiceWorkerHandler() {
   const router = useRouter();
@@ -14,14 +15,34 @@ export default function ServiceWorkerHandler() {
   useSSEConnection();
 
   useEffect(() => {
-    function handler(event: NewsUpdateEvent) {
-      router.refresh();
-      router.prefetch(`/tasks/${event.detail.taskId}`);
-      router.prefetch("/");
-      toast.success(event.detail.message);
+    function handler(event: TaskNotificationEvent) {
+      const pathname = window.location.pathname;
+      const handleTaskNotification = () => {
+        if (
+          pathname === "/" ||
+          pathname.startsWith(`/tasks/${event.detail.taskId}`)
+        ) {
+          router.refresh();
+        }
+        router.prefetch(`/tasks/${event.detail.taskId}`);
+        router.prefetch("/");
+      };
+      if (event.detail.pushType === "refresh") {
+        handleTaskNotification();
+      } else if (event.detail.pushType === "notification") {
+        handleTaskNotification();
+        toast.success(event.detail.message, {
+          action: {
+            label: "View Details",
+            onClick: () => router.push(`/tasks/${event.detail.taskId}`),
+          },
+        });
+      } else {
+        assertNever(event.detail.pushType);
+      }
     }
-    window.addEventListener("news-update", handler);
-    return () => window.removeEventListener("news-update", handler);
+    window.addEventListener("task-notification", handler);
+    return () => window.removeEventListener("task-notification", handler);
   }, [router]);
 
   // This component doesn't render anything

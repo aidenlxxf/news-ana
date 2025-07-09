@@ -8,7 +8,7 @@ import { atomWithRefresh, loadable } from "jotai/utils";
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { atomEffect } from "jotai-effect";
-import { isNewsUpdateMessage, NewsUpdateEvent } from "@/types/frontend";
+import { isTaskWebPushMessage, TaskNotificationEvent } from "@/types/frontend";
 
 export const isWebPushSupportedAtom = atom(
   (get) =>
@@ -23,8 +23,8 @@ export const isServiceWorkerSupportedAtom = atom(
 export const pushMessageProxyAtom = atomEffect((get) => {
   if (!get(isWebPushSupportedAtom)) return;
   function proxyPushMessage(event: MessageEvent) {
-    if (isNewsUpdateMessage(event.data)) {
-      window.dispatchEvent(new NewsUpdateEvent(event.data.payload));
+    if (isTaskWebPushMessage(event.data)) {
+      window.dispatchEvent(new TaskNotificationEvent(event.data.payload));
     }
   }
   navigator.serviceWorker.addEventListener("message", proxyPushMessage);

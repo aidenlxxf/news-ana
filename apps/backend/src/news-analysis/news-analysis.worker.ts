@@ -84,6 +84,12 @@ export class NewsAnalysisWorker extends WorkerHost {
         );
       }
 
+      // Update status to ANALYZING
+      await this.taskExecutionService.updateExecutionStatus(
+        executionId,
+        ExecutionStatus.ANALYZING,
+      );
+
       this.logger.log("Starting News analysis:", {
         articleCount: fetchExecution.result.articles.length,
         sources: fetchExecution.result.sources,

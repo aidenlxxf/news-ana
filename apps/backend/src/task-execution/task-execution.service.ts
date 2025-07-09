@@ -49,12 +49,8 @@ export class TaskExecutionService {
 
     this.logger.log(`Updated execution ${executionId} status to ${status}`);
 
-    if (
-      status === ExecutionStatus.COMPLETED ||
-      status === ExecutionStatus.FAILED
-    ) {
-      await this.sendNotification(execution, status);
-    }
+    // Send notification for all status changes
+    await this.sendNotification(execution, status);
 
     return execution;
   }
@@ -68,9 +64,10 @@ export class TaskExecutionService {
     status: ExecutionStatus,
   ): Promise<void> {
     const message = this.buildNotificationMessage(execution, status);
+    const pushType = this.getPushType(status);
 
     this.logger.log(
-      `Sending notification for execution ${execution.id}: ${message}`,
+      `Sending notification for execution ${execution.id}: ${message} (pushType: ${pushType})`,
     );
 
     if (this.notificationService) {
@@ -79,6 +76,7 @@ export class TaskExecutionService {
         message,
         status: status === ExecutionStatus.COMPLETED ? "success" : "error",
         type: "task",
+        pushType,
       };
 
       await this.notificationService.sendNotification(
@@ -89,6 +87,22 @@ export class TaskExecutionService {
       this.logger.warn(
         "NotificationService not available, skipping notifications",
       );
+    }
+  }
+
+  private getPushType(status: ExecutionStatus): "refresh" | "notification" {
+    // Only show notifications for final states (completed/failed)
+    // Intermediate states (fetching/analyzing) only trigger page refresh
+    switch (status) {
+      case ExecutionStatus.COMPLETED:
+      case ExecutionStatus.FAILED:
+        return "notification";
+      case ExecutionStatus.PENDING:
+      case ExecutionStatus.FETCHING:
+      case ExecutionStatus.ANALYZING:
+        return "refresh";
+      default:
+        return "refresh";
     }
   }
 

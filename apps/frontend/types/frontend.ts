@@ -14,30 +14,32 @@ export interface UpdateTaskActionState {
 }
 
 // Service Worker Message Types
-export interface NewsUpdateMessage {
-  type: "news-update";
+export interface TaskWebPushMessage {
+  type: typeof TASK_WEB_PUSH_MESSAGE_TYPE;
   payload: TaskNotificationDto;
 }
 
-declare global {
-  interface WindowEventMap {
-    "news-update": NewsUpdateEvent;
-  }
-}
+const TASK_WEB_PUSH_MESSAGE_TYPE = "task-web-push";
 
-export function isNewsUpdateMessage(
+export function isTaskWebPushMessage(
   message: unknown,
-): message is NewsUpdateMessage {
+): message is TaskWebPushMessage {
   return (
     typeof message === "object" &&
     message !== null &&
     "type" in message &&
-    message.type === "news-update"
+    message.type === TASK_WEB_PUSH_MESSAGE_TYPE
   );
 }
 
-export class NewsUpdateEvent extends CustomEvent<TaskNotificationDto> {
+export class TaskNotificationEvent extends CustomEvent<TaskNotificationDto> {
   constructor(data: TaskNotificationDto) {
-    super("news-update", { detail: data });
+    super("task-notification", { detail: data });
+  }
+}
+
+declare global {
+  interface WindowEventMap {
+    "task-notification": TaskNotificationEvent;
   }
 }

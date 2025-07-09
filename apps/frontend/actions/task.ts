@@ -40,6 +40,7 @@ export async function createTaskAction(
         taskId: response.taskId,
         message: response.message,
         status: "success",
+        pushType: "notification",
         type: "task",
       },
     };
