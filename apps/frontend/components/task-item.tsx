@@ -43,53 +43,67 @@ export default function TaskItem({ task }: TaskItemProps) {
         </div>
         <CardDescription>
           {/* Task Parameters */}
-          <div className="space-y-2">
+          <dl className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
             {task.country && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Globe className="h-4 w-4" />
-                <span className="font-medium">Country:</span>
-                <span>{task.country.toUpperCase()}</span>
+              <div className="flex items-center gap-2">
+                <dt className="flex items-center gap-2 text-gray-600 font-medium min-w-0">
+                  <Globe className="h-4 w-4 flex-shrink-0" />
+                  Country:
+                </dt>
+                <dd className="text-gray-900 font-medium">
+                  {task.country.toUpperCase()}
+                </dd>
               </div>
             )}
 
             {task.category && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Tag className="h-4 w-4" />
-                <span className="font-medium">Category:</span>
-                <span className="capitalize">{task.category}</span>
+              <div className="flex items-center gap-2">
+                <dt className="flex items-center gap-2 text-gray-600 font-medium min-w-0">
+                  <Tag className="h-4 w-4 flex-shrink-0" />
+                  Category:
+                </dt>
+                <dd className="text-gray-900 capitalize">{task.category}</dd>
               </div>
             )}
 
             {task.query && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Search className="h-4 w-4" />
-                <span className="font-medium">Query:</span>
-                <span className="truncate">{task.query}</span>
+              <div className="flex items-center gap-2 sm:col-span-2">
+                <dt className="flex items-center gap-2 text-gray-600 font-medium min-w-0">
+                  <Search className="h-4 w-4 flex-shrink-0" />
+                  Query:
+                </dt>
+                <dd className="text-gray-900 truncate">{task.query}</dd>
               </div>
             )}
 
             {/* Schedule Information */}
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Clock className="h-4 w-4" />
-              <span className="font-medium">Schedule:</span>
-              <span>{formatScheduleDisplay(task.schedule)}</span>
+            <div className="flex items-center gap-2">
+              <dt className="flex items-center gap-2 text-gray-600 font-medium min-w-0">
+                <Clock className="h-4 w-4 flex-shrink-0" />
+                Schedule:
+              </dt>
+              <dd className="text-gray-900">
+                {formatScheduleDisplay(task.schedule)}
+              </dd>
             </div>
 
             {/* Next Run Time */}
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Clock className="h-4 w-4" />
-              <span className="font-medium">Next run:</span>
-              <span
+            <div className="flex items-center gap-2">
+              <dt className="flex items-center gap-2 text-gray-600 font-medium min-w-0">
+                <Clock className="h-4 w-4 flex-shrink-0" />
+                Next run:
+              </dt>
+              <dd
                 className={
                   task.nextRunAt && new Date(task.nextRunAt) < new Date()
                     ? "text-red-600 font-medium"
-                    : ""
+                    : "text-gray-900"
                 }
               >
                 {formatNextRunTime(task.nextRunAt)}
-              </span>
+              </dd>
             </div>
-          </div>
+          </dl>
         </CardDescription>
       </CardHeader>
 

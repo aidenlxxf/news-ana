@@ -1,4 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { listTasks } from "@/lib/api";
 import TaskItem from "./task-item";
 
@@ -16,26 +17,34 @@ export default async function TaskList({
 
   if (tasks.length === 0) {
     return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>News Analysis Tasks</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-500 text-center py-8">
-            No tasks found. Create your first news analysis task below.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold text-gray-900 pl-4">
+          News Analysis Tasks
+        </h2>
+        <Card className="w-full">
+          <CardContent>
+            <p className="text-gray-500 text-center py-8">
+              No tasks found. Create your first news analysis task below.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>News Analysis Tasks ({tasks.length})</CardTitle>
-        </CardHeader>
-      </Card>
+      <div className="flex items-center gap-3 pl-4">
+        <h2 className="text-2xl font-bold text-gray-900">
+          News Analysis Tasks
+        </h2>
+        <Badge
+          variant="outline"
+          className="text-sm bg-blue-50 text-blue-700 border-blue-200"
+        >
+          {tasks.length}
+        </Badge>
+      </div>
 
       <div className="grid gap-4">
         {tasks.map((task) => (
