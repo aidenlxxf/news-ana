@@ -1,8 +1,9 @@
 import {
   ApiErrorResponse,
+  parseScheduleCron,
+  ScheduleDto,
+  ScheduleSchema,
   TaskExecution,
-  TaskParametersV1,
-  TaskParametersV1Schema,
 } from "@na/schema";
 import { InjectQueue } from "@nestjs/bullmq";
 import {
@@ -15,14 +16,17 @@ import * as v from "valibot";
 import { PrismaService } from "@/prisma.service";
 import { generateSchedulerId } from "@/utils/bullmq-id.util";
 import { generateParamsHash } from "@/utils/hash.util";
-import { CreateTaskResponseDto } from "./dto/create-task.dto";
+import { CreateTaskDto, CreateTaskResponseDto } from "./dto/create-task.dto";
 import { GetLatestResultResponseDto } from "./dto/get-latest-result.dto";
 import { GetTaskResponseDto } from "./dto/get-task.dto";
 import { ListTasksResponseDto } from "./dto/list-task.dto";
 import { ListTaskExecutionsResponseDto } from "./dto/list-task-executions.dto";
 import { RefreshTaskResponseDto } from "./dto/refresh-task.dto";
-import { UpdateTaskResponseDto } from "./dto/update-task.dto";
+import { UpdateTaskDto, UpdateTaskResponseDto } from "./dto/update-task.dto";
 import { type TaskSchedulerQueue } from "./task-scheduler.worker";
+import { getNextRunTime } from "@/utils/time.util";
+
+export type ScheduleParsedType = v.InferOutput<typeof ScheduleSchema>;
 
 @Injectable()
 export class NewsAnalysisTaskService {
@@ -32,37 +36,39 @@ export class NewsAnalysisTaskService {
     private readonly taskSchedulerQueue: TaskSchedulerQueue,
   ) {}
 
-  private async scheduleTask(taskId: string) {
+  private async scheduleTask(
+    taskId: string,
+    schedule: ScheduleDto,
+    { immediately = true }: { immediately?: boolean } = {},
+  ) {
+    const cronExpression = parseScheduleCron(schedule);
     const schedulerId = generateSchedulerId(taskId);
-    const existing = await this.taskSchedulerQueue.getJobScheduler(schedulerId);
-    if (existing) {
-      // ask scheduler to run immediately
-      await this.taskSchedulerQueue.add(`task-scheduler:${taskId}`, { taskId });
-      return;
+    const jobName = `task-scheduler:${taskId}`;
+
+    const job = await this.taskSchedulerQueue.getJobScheduler(schedulerId);
+    if (job && immediately) {
+      // when inserting the first job, we need to manually trigger it
+      // @see https://github.com/taskforcesh/bullmq/issues/3095
+      // await this.taskSchedulerQueue.add(jobName, { taskId });
+      // PS: it's seem to have issue only with every: ..., not pattern: <CRON>
+      // so we need to manually trigger it
     }
+
     return await this.taskSchedulerQueue.upsertJobScheduler(
       schedulerId,
-      { pattern: "0 0 * * *", immediately: true },
-      { name: `task-scheduler:${taskId}`, data: { taskId } },
+      { pattern: cronExpression, immediately },
+      { name: jobName, data: { taskId } },
     );
   }
 
   async createTask(
-    {
-      country,
-      category,
-      query,
-    }: Pick<TaskParametersV1, "country" | "category" | "query">,
+    dto: CreateTaskDto,
     userId: string,
   ): Promise<CreateTaskResponseDto> {
-    const parameters = v.parse(TaskParametersV1Schema, {
-      country,
-      category,
-      query,
-      version: "news-fetch:v1",
-    });
+    const parameters = dto.data;
 
-    const paramsHash = generateParamsHash(country, category, query);
+    const paramsHash = generateParamsHash(parameters);
+
     const task = await this.prisma.$transaction(async (tx) => {
       const existing = await tx.task.findUnique({
         where: { userId_paramsHash: { userId, paramsHash } },
@@ -78,11 +84,13 @@ export class NewsAnalysisTaskService {
       const task = await tx.task.create({
         data: {
           userId,
-          parameters,
-          paramsHash: generateParamsHash(country, category, query),
+          parameters: { ...parameters, version: "news-fetch:v1" },
+          paramsHash,
         },
       });
-      await this.scheduleTask(task.id);
+      await this.scheduleTask(task.id, parameters.schedule, {
+        immediately: true,
+      });
 
       return task;
     });
@@ -121,6 +129,8 @@ export class NewsAnalysisTaskService {
       country: params.country,
       category: params.category,
       query: params.query,
+      schedule: params.schedule,
+      nextRunAt: getNextRunTime(params.schedule).toISOString(),
       createdAt: task.createdAt.toISOString(),
       lastExecution: lastExecution
         ? {
@@ -236,18 +246,21 @@ export class NewsAnalysisTaskService {
     });
 
     return {
-      tasks: tasks.map(({ id, parameters: params, createdAt, executions }) => {
+      tasks: tasks.map(({ id, parameters, createdAt, executions }) => {
+        const lastExecution = executions.at(0) ?? null;
         return {
           id,
-          country: params.country ?? undefined,
-          category: params.category ?? undefined,
-          query: params.query ?? undefined,
+          country: parameters.country,
+          category: parameters.category,
+          query: parameters.query,
+          schedule: parameters.schedule,
+          nextRunAt: getNextRunTime(parameters.schedule).toISOString(),
           createdAt: createdAt.toISOString(),
-          lastExecution: executions[0] && {
-            status: executions[0].status,
-            createdAt: executions[0].createdAt.toISOString(),
-            startedAt: executions[0].startedAt?.toISOString(),
-            completedAt: executions[0].completedAt?.toISOString(),
+          lastExecution: lastExecution && {
+            status: lastExecution.status,
+            createdAt: lastExecution.createdAt.toISOString(),
+            startedAt: lastExecution.startedAt?.toISOString() ?? null,
+            completedAt: lastExecution.completedAt?.toISOString() ?? null,
           },
         };
       }),
@@ -268,7 +281,9 @@ export class NewsAnalysisTaskService {
       throw new NotFoundException("Task not found");
     }
 
-    await this.scheduleTask(taskId);
+    await this.scheduleTask(taskId, task.parameters.schedule, {
+      immediately: true,
+    });
 
     return {
       taskId,
@@ -358,47 +373,32 @@ export class NewsAnalysisTaskService {
 
   async updateTask(
     taskId: string,
-    {
-      country,
-      category,
-      query,
-    }: Pick<TaskParametersV1, "country" | "category" | "query">,
+    dto: UpdateTaskDto,
     userId: string,
   ): Promise<UpdateTaskResponseDto> {
-    // First verify the task belongs to the user
-    const existingTask = await this.prisma.task.findFirst({
-      where: { id: taskId, userId },
-    });
+    const parameters = dto.data;
+    const { immediately = true } = dto.data;
 
-    if (!existingTask) {
-      throw new NotFoundException("Task not found");
-    }
-
-    const parameters = v.parse(TaskParametersV1Schema, {
-      country,
-      category,
-      query,
-      version: "news-fetch:v1",
-    });
-
-    const newParamsHash = generateParamsHash(country, category, query);
-
-    if (newParamsHash === existingTask.paramsHash) {
-      return {
-        taskId,
-        message: "Task not changed",
-      };
-    }
+    const paramsHash = generateParamsHash(parameters);
 
     // Update the task
     const updatedTask = await this.prisma.$transaction(async (tx) => {
+      // First verify the task belongs to the user
+      const existingTask = await this.prisma.task.findFirst({
+        where: { id: taskId, userId },
+      });
+
+      if (!existingTask) {
+        throw new NotFoundException("Task not found");
+      }
+
       // Check if the new parameters would conflict with another task
       const conflictingTask = await this.prisma.task.findUnique({
-        where: { userId_paramsHash: { userId, paramsHash: newParamsHash } },
+        where: { userId_paramsHash: { userId, paramsHash } },
         select: { id: true },
       });
 
-      if (conflictingTask) {
+      if (conflictingTask && conflictingTask.id !== taskId) {
         throw new ConflictException({
           message: "Task with same parameters already exists",
           statusCode: 409,
@@ -409,19 +409,22 @@ export class NewsAnalysisTaskService {
       const task = await tx.task.update({
         where: { id: taskId },
         data: {
-          parameters,
-          paramsHash: newParamsHash,
-          updatedAt: new Date(),
-          executions: {
-            // clear all previous execution results
-            deleteMany: {},
+          parameters: {
+            ...parameters,
+            version: "news-fetch:v1",
           },
+          paramsHash,
+          updatedAt: new Date(),
+          executions:
+            paramsHash !== existingTask.paramsHash
+              ? { deleteMany: {} } // clear all previous execution results
+              : {},
         },
       });
 
       return task;
     });
-    await this.scheduleTask(taskId);
+    await this.scheduleTask(taskId, parameters.schedule, { immediately });
 
     return {
       taskId: updatedTask.id,

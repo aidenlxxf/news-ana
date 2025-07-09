@@ -6,11 +6,11 @@ export default function TaskDetailLoading() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
-        {/* 导航栏骨架 */}
+        {/* Navbar skeleton */}
         <div className="mb-6">
           <div className="inline-flex items-center gap-2 text-gray-400 mb-4">
             <ArrowLeft className="h-4 w-4" />
-            返回任务列表
+            Back to Task List
           </div>
 
           <div className="flex items-center justify-between">
@@ -27,9 +27,9 @@ export default function TaskDetailLoading() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* 左侧：任务信息骨架 */}
+          {/* Left: Task Information Skeleton */}
           <div className="lg:col-span-1 space-y-6">
-            {/* 任务信息卡片骨架 */}
+            {/* Task Information Card Skeleton */}
             <Card>
               <CardHeader>
                 <Skeleton className="h-6 w-24" />
@@ -51,7 +51,7 @@ export default function TaskDetailLoading() {
               </CardContent>
             </Card>
 
-            {/* 执行状态卡片骨架 */}
+            {/* Execution Status Card Skeleton */}
             <Card>
               <CardHeader>
                 <Skeleton className="h-6 w-20" />
@@ -67,14 +67,14 @@ export default function TaskDetailLoading() {
             </Card>
           </div>
 
-          {/* 右侧：分析结果骨架 */}
+          {/* Right: Analysis Result Skeleton */}
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
                 <Skeleton className="h-6 w-24" />
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* 摘要骨架 */}
+                {/* Summary Skeleton */}
                 <div className="space-y-3">
                   <Skeleton className="h-5 w-20" />
                   <Skeleton className="h-4 w-full" />
@@ -82,7 +82,7 @@ export default function TaskDetailLoading() {
                   <Skeleton className="h-4 w-1/2" />
                 </div>
 
-                {/* 关键词骨架 */}
+                {/* Keywords Skeleton */}
                 <div className="space-y-3">
                   <Skeleton className="h-5 w-16" />
                   <div className="flex flex-wrap gap-2">
@@ -93,7 +93,7 @@ export default function TaskDetailLoading() {
                   </div>
                 </div>
 
-                {/* 新闻文章骨架 */}
+                {/* News Article Skeleton */}
                 <div className="space-y-3">
                   <Skeleton className="h-5 w-20" />
                   <div className="space-y-4">

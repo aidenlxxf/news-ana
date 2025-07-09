@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getStatusColor, getStatusText } from "@/lib/task-utils";
 
 interface ExecutionStatusProps {
   lastExecution?: GetTaskResponseDto["lastExecution"];
@@ -30,39 +31,6 @@ function getStatusIcon(status: ExecutionStatusType) {
     case "FETCHING":
     case "ANALYZING":
       return <Loader2 className="h-4 w-4 text-blue-600 animate-spin" />;
-    default:
-      assertNever(status);
-  }
-}
-
-function getStatusColor(status: ExecutionStatusType): string {
-  switch (status) {
-    case "COMPLETED":
-      return "bg-green-100 text-green-800";
-    case "FAILED":
-      return "bg-red-100 text-red-800";
-    case "PENDING":
-      return "bg-yellow-100 text-yellow-800";
-    case "FETCHING":
-    case "ANALYZING":
-      return "bg-blue-100 text-blue-800";
-    default:
-      assertNever(status);
-  }
-}
-
-function getStatusText(status: ExecutionStatusType): string {
-  switch (status) {
-    case "COMPLETED":
-      return "Completed";
-    case "FAILED":
-      return "Failed";
-    case "PENDING":
-      return "Pending";
-    case "FETCHING":
-      return "Fetching News";
-    case "ANALYZING":
-      return "Analyzing";
     default:
       assertNever(status);
   }

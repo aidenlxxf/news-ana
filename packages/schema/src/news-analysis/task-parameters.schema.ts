@@ -1,4 +1,6 @@
 import * as v from "valibot";
+import { ScheduleSchema } from "./task-schedule.schema.js";
+import { formNullish } from "../utils/form-helpers.js";
 
 export const NewsApiCountrySchema = v.picklist([
   "ae",
@@ -70,29 +72,29 @@ export const NewsApiCategorySchema = v.picklist([
 export type NewsApiCountry = v.InferOutput<typeof NewsApiCountrySchema>;
 export type NewsApiCategory = v.InferOutput<typeof NewsApiCategorySchema>;
 
-export const TaskParametersV1Schema = v.pipe(
+export const TaskBaseParametersSchema = v.pipe(
   v.object({
-    country: v.nullish(NewsApiCountrySchema),
-    category: v.nullish(NewsApiCategorySchema),
-    query: v.nullish(v.string()),
-    version: v.literal("news-fetch:v1"),
+    country: formNullish(NewsApiCountrySchema),
+    category: formNullish(NewsApiCategorySchema),
+    query: formNullish(v.string()),
+    schedule: ScheduleSchema,
   }),
   v.check(
     (params) =>
       !(
-        params.category === undefined &&
-        params.country === undefined &&
-        params.query === undefined
+        params.category === null &&
+        params.country === null &&
+        params.query === null
       ),
     "at least one of country, category, or query must be provided",
   ),
-  v.transform((params) => ({
-    ...params,
-    country: params.country ?? null,
-    category: params.category ?? null,
-    query: params.query ?? null,
-  })),
-  v.brand("TaskParametersV1Schema"),
+);
+
+export const TaskParametersV1Schema = v.pipe(
+  v.object({
+    ...TaskBaseParametersSchema.entries,
+    version: v.literal("news-fetch:v1"),
+  }),
 );
 
 export type TaskParametersV1 = v.InferOutput<typeof TaskParametersV1Schema>;

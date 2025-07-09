@@ -64,29 +64,3 @@ export async function isAuthenticated(): Promise<boolean> {
   const user = await getAuthenticatedUser();
   return user !== null;
 }
-
-/**
- * Check if JWT token is expired (basic check without verification)
- * This is a client-side helper for token refresh timing
- */
-export function isTokenExpired(token: string): boolean {
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    const currentTime = Math.floor(Date.now() / 1000);
-    return payload.exp < currentTime;
-  } catch (error) {
-    return true; // If we can't parse, consider it expired
-  }
-}
-
-/**
- * Get token expiration time in seconds
- */
-export function getTokenExpiration(token: string): number | null {
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload.exp;
-  } catch (error) {
-    return null;
-  }
-}

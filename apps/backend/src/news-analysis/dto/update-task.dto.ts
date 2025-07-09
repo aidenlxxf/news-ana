@@ -1,10 +1,6 @@
-import {
-  UpdateTaskDtoType,
-  UpdateTaskResponseDto,
-  UpdateTaskSchema,
-} from "@na/schema";
+import { UpdateTaskSchema } from "@na/schema";
 import { ValibotDto } from "@/validators/valibot.dto";
 
-export type { UpdateTaskDtoType, UpdateTaskResponseDto };
+export type { UpdateTaskResponseDto } from "@na/schema";
 
 export class UpdateTaskDto extends ValibotDto(UpdateTaskSchema) {}

@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { createTaskAction } from "@/actions/task";
 import CategorySelect from "@/components/category-select";
 import CountrySelect from "@/components/country-select";
+import ScheduleSelect from "@/components/schedule-select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -56,6 +57,9 @@ export default function CreateTaskForm() {
               disabled={isPending}
             />
           </div>
+
+          {/* Schedule Selection */}
+          <ScheduleSelect />
 
           {/* Help Text */}
           <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">

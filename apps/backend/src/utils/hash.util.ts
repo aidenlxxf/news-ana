@@ -1,14 +1,19 @@
+import { TaskParametersV1 } from "@na/schema";
 import { createHash } from "node:crypto";
 
+/**
+ * Generate a hash of the task parameters. distincted by country, category, and query.
+ *
+ * @param params - The task parameters
+ * @returns The hash of the task parameters
+ */
 export function generateParamsHash(
-  country?: string | null,
-  category?: string | null,
-  query?: string | null,
+  params: Pick<TaskParametersV1, "country" | "category" | "query">,
 ): string {
   const normalized = JSON.stringify({
-    country: country?.toLowerCase().trim() || null,
-    category: category?.toLowerCase().trim() || null,
-    query: query?.toLowerCase().trim() || null,
+    country: params.country?.toLowerCase().trim() || null,
+    category: params.category?.toLowerCase().trim() || null,
+    query: params.query?.toLowerCase().trim() || null,
   });
 
   return createHash("sha256").update(normalized).digest("hex");

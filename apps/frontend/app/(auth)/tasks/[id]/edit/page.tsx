@@ -48,6 +48,7 @@ export default async function EditTaskPage({ params }: EditTaskPageProps) {
               country: task.country,
               category: task.category,
               query: task.query,
+              schedule: task.schedule,
             }}
           />
         </div>

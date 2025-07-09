@@ -1,41 +1,15 @@
 import * as v from "valibot";
-import {
-  NewsApiCategorySchema,
-  NewsApiCountrySchema,
-} from "../news-analysis/task-parameters.schema.js";
-import { formNullish, formInteger } from "../utils/form-helpers.js";
+import { TaskBaseParametersSchema } from "../news-analysis/task-parameters.schema.js";
+import { formInteger } from "../utils/form-helpers.js";
 
 // Create Task Schema
-export const CreateTaskSchema = v.pipe(
-  v.object({
-    country: formNullish(NewsApiCountrySchema),
-    category: formNullish(NewsApiCategorySchema),
-    query: formNullish(v.string()),
-  }),
-  v.check(
-    (params) => !!(params.category || params.country || params.query),
-    "at least one of country, category, or query must be provided",
-  ),
-  v.brand("CreateTaskSchema"),
-);
-
-export type CreateTaskDtoType = v.InferOutput<typeof CreateTaskSchema>;
+export const CreateTaskSchema = TaskBaseParametersSchema;
 
 // Update Task Schema
-export const UpdateTaskSchema = v.pipe(
-  v.object({
-    country: formNullish(NewsApiCountrySchema),
-    category: formNullish(NewsApiCategorySchema),
-    query: formNullish(v.string()),
-  }),
-  v.check(
-    (params) => !!(params.category || params.country || params.query),
-    "at least one of country, category, or query must be provided",
-  ),
-  v.brand("UpdateTaskSchema"),
-);
-
-export type UpdateTaskDtoType = v.InferOutput<typeof UpdateTaskSchema>;
+export const UpdateTaskSchema = v.object({
+  ...TaskBaseParametersSchema.entries,
+  immediately: v.optional(v.boolean()),
+});
 
 // List Tasks Query Schema
 export const ListTasksQuerySchema = v.object({
@@ -43,17 +17,11 @@ export const ListTasksQuerySchema = v.object({
   offset: v.pipe(formInteger(0), v.minValue(0)),
 });
 
-export type ListTasksQueryType = v.InferOutput<typeof ListTasksQuerySchema>;
-
 // List Task Executions Query Schema
 export const ListTaskExecutionsQuerySchema = v.object({
   limit: v.pipe(formInteger(20), v.minValue(1)),
   offset: v.pipe(formInteger(0), v.minValue(0)),
 });
-
-export type ListTaskExecutionsQueryType = v.InferOutput<
-  typeof ListTaskExecutionsQuerySchema
->;
 
 /**
  * DOM API PushSubscriptionJSON
@@ -73,7 +41,3 @@ export const CreatePushSubscriptionSchema = v.object({
     auth: v.string(),
   }),
 });
-
-export type CreatePushSubscriptionDtoType = v.InferInput<
-  typeof CreatePushSubscriptionSchema
->;

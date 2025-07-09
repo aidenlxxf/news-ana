@@ -1,7 +1,8 @@
 import type { GetTaskResponseDto } from "@na/schema";
-import { Calendar, Globe, Search, Tag } from "lucide-react";
+import { Calendar, Clock, Globe, Search, Tag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatScheduleDisplay, formatNextRunTime } from "@/lib/task-utils";
 
 interface TaskInfoCardProps {
   task: GetTaskResponseDto;
@@ -63,6 +64,42 @@ export default function TaskInfoCard({ task }: TaskInfoCardProps) {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Separator */}
+        <div className="border-t border-gray-200" />
+
+        {/* Schedule Information */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-orange-100">
+              <Clock className="h-4 w-4 text-orange-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">Schedule</p>
+              <p className="text-sm text-gray-600">
+                {formatScheduleDisplay(task.schedule)}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100">
+              <Clock className="h-4 w-4 text-yellow-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">Next Run</p>
+              <p
+                className={`text-sm ${
+                  task.nextRunAt && new Date(task.nextRunAt) < new Date()
+                    ? "text-red-600 font-medium"
+                    : "text-gray-600"
+                }`}
+              >
+                {formatNextRunTime(task.nextRunAt)}
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Separator */}

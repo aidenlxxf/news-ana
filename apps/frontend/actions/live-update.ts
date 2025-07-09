@@ -1,6 +1,11 @@
 "use server";
 import { subscribeWebPush, unsubscribeWebPush } from "@/lib/api";
-import type { CreatePushSubscriptionDtoType } from "@na/schema";
+import type { CreatePushSubscriptionSchema } from "@na/schema";
+import type * as v from "valibot";
+
+type CreatePushSubscriptionDtoType = v.InferInput<
+  typeof CreatePushSubscriptionSchema
+>;
 
 // Server Action for subscribing to web push notifications
 

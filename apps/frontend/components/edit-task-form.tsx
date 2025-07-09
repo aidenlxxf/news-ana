@@ -3,13 +3,16 @@
 import { Edit } from "lucide-react";
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
+import type { ScheduleDto } from "@na/schema";
 import { updateTaskAction } from "@/actions/task";
 import CategorySelect from "@/components/category-select";
 import CountrySelect from "@/components/country-select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import ScheduleSelect from "@/components/schedule-select";
 import Form from "next/form";
 
 interface EditTaskFormProps {
@@ -18,6 +21,7 @@ interface EditTaskFormProps {
     country?: string | null;
     category?: string | null;
     query?: string | null;
+    schedule?: ScheduleDto;
   };
 }
 
@@ -76,6 +80,29 @@ export default function EditTaskForm({
               disabled={isPending}
             />
           </div>
+
+          {/* Schedule Selection */}
+          <ScheduleSelect defaultSchedule={defaultValues.schedule} />
+
+          {/* Execute Immediately Option */}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="immediately"
+              name="immediately"
+              defaultChecked={true}
+              disabled={isPending}
+            />
+            <Label
+              htmlFor="immediately"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Execute new task immediately
+            </Label>
+          </div>
+          <p className="text-sm text-gray-600">
+            When enabled, the task will run immediately after being updated in
+            addition to its scheduled runs.
+          </p>
 
           {/* Help Text */}
           <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">

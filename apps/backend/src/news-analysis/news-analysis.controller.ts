@@ -48,7 +48,7 @@ export class NewsAnalysisController {
     @Body() createTaskDto: CreateTaskDto,
     @User() user: UserEntity,
   ): Promise<CreateTaskResponseDto> {
-    return this.newsAnalysisService.createTask(createTaskDto.data, user.id);
+    return this.newsAnalysisService.createTask(createTaskDto, user.id);
   }
 
   @Get("tasks")
@@ -117,6 +117,6 @@ export class NewsAnalysisController {
     @Body() updateTaskDto: UpdateTaskDto,
     @User() user: UserEntity,
   ): Promise<UpdateTaskResponseDto> {
-    return this.newsAnalysisService.updateTask(id, updateTaskDto.data, user.id);
+    return this.newsAnalysisService.updateTask(id, updateTaskDto, user.id);
   }
 }

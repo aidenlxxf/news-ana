@@ -34,7 +34,7 @@ export default function CategorySelect({ defaultValue }: CategorySelectProps) {
   );
 
   const clearCategorySelection = () => {
-    setSelectedCategory(void 0);
+    setSelectedCategory("");
   };
 
   return (

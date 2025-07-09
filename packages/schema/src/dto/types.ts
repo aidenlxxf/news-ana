@@ -1,4 +1,5 @@
 import type { NewsAnalysisResultV1 } from "../news-analysis/news-analysis.schema.js";
+import type { ScheduleDto } from "../news-analysis/task-schedule.schema.js";
 
 // Common execution status type (matches Prisma enum)
 export type ExecutionStatus =
@@ -14,6 +15,8 @@ export interface GetTaskResponseDto {
   country?: string | null;
   category?: string | null;
   query?: string | null;
+  schedule: ScheduleDto;
+  nextRunAt?: string | null;
   createdAt: string;
   lastExecution?: {
     status: ExecutionStatus;
@@ -46,17 +49,19 @@ export interface ListTasksResponseDto {
 
 export interface TaskSummary {
   id: string;
-  country?: string;
-  category?: string;
-  query?: string;
+  country: string | null;
+  category: string | null;
+  query: string | null;
+  schedule: ScheduleDto;
+  nextRunAt: string;
   /** ISO 8601 */
   createdAt: string;
-  lastExecution?: {
+  lastExecution: {
     status: ExecutionStatus;
     createdAt: string;
-    startedAt?: string;
-    completedAt?: string;
-  };
+    startedAt: string | null;
+    completedAt: string | null;
+  } | null;
 }
 
 export interface ListTaskExecutionsResponseDto {

@@ -1,8 +1,6 @@
 import type {
   ApiErrorResponse,
   AuthResponseDto,
-  CreatePushSubscriptionDtoType,
-  CreateTaskDtoType,
   CreateTaskResponseDto,
   GetLatestResultResponseDto,
   GetTaskResponseDto,
@@ -11,10 +9,19 @@ import type {
   RefreshTaskResponseDto,
   RegisterDto,
   TaskExecution,
-  UpdateTaskDtoType,
   UpdateTaskResponseDto,
   UserProfileDto,
+  CreateTaskSchema,
+  UpdateTaskSchema,
+  CreatePushSubscriptionSchema,
 } from "@na/schema";
+import type * as v from "valibot";
+
+type CreateTaskDtoType = v.InferInput<typeof CreateTaskSchema>;
+type UpdateTaskDtoType = v.InferInput<typeof UpdateTaskSchema>;
+type CreatePushSubscriptionDtoType = v.InferInput<
+  typeof CreatePushSubscriptionSchema
+>;
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 

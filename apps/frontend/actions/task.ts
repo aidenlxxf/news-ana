@@ -9,6 +9,7 @@ import type {
   UpdateTaskActionState,
 } from "@/types/frontend";
 import { handleNextRedirect } from "@/lib/next";
+import { SCHEDULE_FIELDS } from "@/lib/schedule";
 
 // Server Action for creating a new task
 export async function createTaskAction(
@@ -20,6 +21,11 @@ export async function createTaskAction(
       country: formData.get("country"),
       category: formData.get("category"),
       query: formData.get("query"),
+      schedule: {
+        type: formData.get(SCHEDULE_FIELDS.type),
+        runAt: formData.get(SCHEDULE_FIELDS.runAt),
+        timezone: formData.get(SCHEDULE_FIELDS.timezone),
+      },
     });
 
     const response = await createTask(taskData);
@@ -90,6 +96,12 @@ export async function updateTaskAction(
       country: formData.get("country"),
       category: formData.get("category"),
       query: formData.get("query"),
+      schedule: {
+        type: formData.get("schedule.type"),
+        runAt: formData.get("schedule.run-at"),
+        timezone: formData.get("schedule.timezone"),
+      },
+      immediately: formData.get("immediately") === "on",
     });
     const taskId = formData.get("task-id");
     if (typeof taskId !== "string" || !taskId)

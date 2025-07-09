@@ -41,7 +41,7 @@ export default function CountrySelect({ defaultValue }: CountrySelectProps) {
   );
 
   const clearCountrySelection = () => {
-    setSelectedCountry(void 0);
+    setSelectedCountry("");
   };
 
   return (

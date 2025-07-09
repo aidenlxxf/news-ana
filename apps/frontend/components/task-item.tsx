@@ -1,6 +1,5 @@
-import type { ExecutionStatus, TaskSummary } from "@na/schema";
-import { assertNever } from "@std/assert/unstable-never";
-import { Eye, Globe, Search, Tag, Trash2 } from "lucide-react";
+import type { TaskSummary } from "@na/schema";
+import { Clock, Eye, Globe, Search, Tag, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { deleteTaskAction } from "@/actions/task";
 import { Badge } from "@/components/ui/badge";
@@ -12,47 +11,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  formatScheduleDisplay,
+  formatNextRunTime,
+  getStatusColor,
+  getStatusText,
+} from "@/lib/task-utils";
 import TaskResultSummary from "./task-result-summary";
 import Form from "next/form";
 
 interface TaskItemProps {
   task: TaskSummary;
-}
-
-function getStatusColor(status?: string): string {
-  switch (status) {
-    case "COMPLETED":
-      return "bg-green-500";
-    case "RUNNING":
-      return "bg-blue-500";
-    case "FAILED":
-      return "bg-red-500";
-    case "PENDING":
-      return "bg-yellow-500";
-    default:
-      return "bg-gray-500";
-  }
-}
-
-function getStatusText(status?: ExecutionStatus): string {
-  if (!status) {
-    return "Unknown";
-  }
-
-  switch (status) {
-    case "COMPLETED":
-      return "Completed";
-    case "FETCHING":
-      return "Fetching";
-    case "FAILED":
-      return "Failed";
-    case "PENDING":
-      return "Pending";
-    case "ANALYZING":
-      return "Analyzing";
-    default:
-      assertNever(status);
-  }
 }
 
 export default function TaskItem({ task }: TaskItemProps) {
@@ -66,7 +35,7 @@ export default function TaskItem({ task }: TaskItemProps) {
           {task.lastExecution?.status && (
             <Badge
               variant="secondary"
-              className={`${getStatusColor(task.lastExecution.status)} text-white`}
+              className={getStatusColor(task.lastExecution.status)}
             >
               {getStatusText(task.lastExecution.status)}
             </Badge>
@@ -98,6 +67,28 @@ export default function TaskItem({ task }: TaskItemProps) {
                 <span className="truncate">{task.query}</span>
               </div>
             )}
+
+            {/* Schedule Information */}
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Clock className="h-4 w-4" />
+              <span className="font-medium">Schedule:</span>
+              <span>{formatScheduleDisplay(task.schedule)}</span>
+            </div>
+
+            {/* Next Run Time */}
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Clock className="h-4 w-4" />
+              <span className="font-medium">Next run:</span>
+              <span
+                className={
+                  task.nextRunAt && new Date(task.nextRunAt) < new Date()
+                    ? "text-red-600 font-medium"
+                    : ""
+                }
+              >
+                {formatNextRunTime(task.nextRunAt)}
+              </span>
+            </div>
           </div>
         </CardDescription>
       </CardHeader>
