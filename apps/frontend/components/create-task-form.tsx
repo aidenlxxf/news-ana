@@ -11,20 +11,27 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
 import Form from "next/form";
 
 export default function CreateTaskForm() {
   const [state, formAction, isPending] = useActionState(createTaskAction, null);
-
+  const router = useRouter();
   // Handle successful task creation
   useEffect(() => {
     if (state?.success) {
-      toast.success(state.data?.message || "Task created successfully!");
+      const taskId = state.data?.taskId;
+      toast.success(state.data?.message || "Task created successfully!", {
+        action: {
+          label: "View Task",
+          onClick: () => router.push(`/tasks/${taskId}`),
+        },
+      });
     }
     if (state?.error) {
       toast.error(state.error);
     }
-  }, [state]);
+  }, [state, router]);
 
   return (
     <Card className="w-full">
