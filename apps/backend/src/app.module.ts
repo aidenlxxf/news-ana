@@ -2,6 +2,8 @@ import { BullModule } from "@nestjs/bullmq";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { APP_FILTER } from "@nestjs/core";
+import { BullBoardModule } from "@bull-board/nestjs";
+import { ExpressAdapter } from "@bull-board/express";
 import { AuthModule } from "./auth/auth.module";
 import { AllExceptionsFilter } from "./filters/http-exception.filter";
 import { NewsAnalysisModule } from "./news-analysis/news-analysis.module";
@@ -22,6 +24,10 @@ import { TaskExecutionModule } from "./task-execution/task-execution.module";
         },
       }),
       inject: [ConfigService],
+    }),
+    BullBoardModule.forRoot({
+      route: "/queue/ui",
+      adapter: ExpressAdapter,
     }),
     AuthModule,
     TaskExecutionModule,

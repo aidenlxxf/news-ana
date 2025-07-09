@@ -1,6 +1,8 @@
 import { BullModule } from "@nestjs/bullmq";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
+import { BullBoardModule } from "@bull-board/nestjs";
+import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
 import { AuthModule } from "../auth/auth.module";
 import { PrismaService } from "../prisma.service";
 import { TaskExecutionModule } from "../task-execution/task-execution.module";
@@ -46,6 +48,18 @@ import { TaskSchedulerWorker } from "./task-scheduler.worker";
           delay: 500,
         },
       },
+    }),
+    BullBoardModule.forFeature({
+      name: "news-fetch",
+      adapter: BullMQAdapter,
+    }),
+    BullBoardModule.forFeature({
+      name: "news-analysis",
+      adapter: BullMQAdapter,
+    }),
+    BullBoardModule.forFeature({
+      name: "task-scheduler",
+      adapter: BullMQAdapter,
     }),
   ],
   controllers: [NewsAnalysisController],
