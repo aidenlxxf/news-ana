@@ -101,6 +101,8 @@ export class NewsFetchService {
       analysis: null,
       analyzedAt: null,
       version: "news-analysis:v1",
+      articleCount: articles.length,
+      hasArticles: articles.length > 0,
     };
   }
 }

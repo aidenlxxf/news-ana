@@ -70,6 +70,33 @@ export default function AnalysisResult({ latestResult }: AnalysisResultProps) {
 
   // Fetch only state (not analyzed)
   if (isFetchedResult(result)) {
+    // Check if no articles were found
+    if (result.articles.length === 0) {
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Analysis Result
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8">
+              <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No News Articles Found
+              </h3>
+              <p className="text-gray-600">
+                No relevant news articles were found for your search criteria.
+                Try adjusting your search parameters or check back later.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    // Articles found, analysis in progress
     return (
       <Card>
         <CardHeader>

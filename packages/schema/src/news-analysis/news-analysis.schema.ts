@@ -30,6 +30,8 @@ export const NewsAnalysisResultV1FetchedSchema = v.object({
   analysis: v.null(),
   analyzedAt: v.null(),
   version: v.literal("news-analysis:v1"),
+  articleCount: v.number(),
+  hasArticles: v.boolean(),
 });
 
 // Analyzed state - complete with AI analysis

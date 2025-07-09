@@ -39,6 +39,20 @@ export default async function TaskResultSummary({
     const result = data.execution.result as NewsAnalysisResult;
 
     if (isFetchedResult(result)) {
+      if (result.articles.length === 0) {
+        return (
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <AlertCircle className="h-3 w-3" />
+              <span>No articles found</span>
+            </div>
+            <div className="text-xs text-gray-500">
+              No relevant news articles were found for this search
+            </div>
+          </div>
+        );
+      }
+
       return (
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-sm text-gray-600">
