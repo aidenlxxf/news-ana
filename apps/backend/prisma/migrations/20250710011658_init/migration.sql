@@ -29,9 +29,6 @@ CREATE TABLE "tasks" (
     "user_id" TEXT NOT NULL,
     "parameters" JSONB NOT NULL,
     "params_hash" TEXT NOT NULL,
-    "schedule_type" TEXT NOT NULL DEFAULT 'daily',
-    "schedule_time" TEXT,
-    "next_run_at" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
