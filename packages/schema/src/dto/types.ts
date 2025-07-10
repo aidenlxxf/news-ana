@@ -79,6 +79,15 @@ export interface TaskExecution {
   errorMessage?: string;
 }
 
+// WebPush related types
+export interface TaskNotificationDto {
+  taskId: string;
+  message: string;
+  status: "success" | "error";
+  type: "task";
+  pushType: "notification" | "refresh";
+}
+
 // Get Latest Result Response
 export interface GetLatestResultResponseDto {
   taskId: string;
