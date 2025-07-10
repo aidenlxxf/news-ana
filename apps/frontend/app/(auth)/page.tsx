@@ -1,8 +1,13 @@
 import CreateTaskForm from "@/components/create-task-form";
 import TaskList from "@/components/task-list";
+import TaskConfigurationChat from "@/components/task-configuration-chat";
 import Toolbar from "@/components/toolbar";
+import { listTasks } from "@/lib/api";
 
 export default function Home() {
+  // Fetch tasks for the TaskConfigurationChat component
+  const tasksPromise = listTasks(50, 0); // Load up to 50 tasks for selection
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
@@ -25,8 +30,9 @@ export default function Home() {
             <TaskList />
           </div>
 
-          {/* Right Column: Create Task Form */}
+          {/* Right Column: AI Chat and Create Task Form */}
           <div className="space-y-6">
+            <TaskConfigurationChat tasksPromise={tasksPromise} />
             <CreateTaskForm />
           </div>
         </div>

@@ -49,14 +49,16 @@ export function getStatusColor(status?: ExecutionStatus | string): string {
 /**
  * Gets the human-readable text for a task execution status
  */
-export function getStatusText(status?: ExecutionStatus): string {
+export function getStatusText(status?: ExecutionStatus | string): string {
   if (!status) {
-    return "Unknown";
+    return "Pending";
   }
 
   switch (status) {
     case "COMPLETED":
       return "Completed";
+    case "RUNNING":
+      return "Running";
     case "FETCHING":
       return "Fetching News";
     case "FAILED":
@@ -66,6 +68,6 @@ export function getStatusText(status?: ExecutionStatus): string {
     case "ANALYZING":
       return "Analyzing";
     default:
-      assertNever(status);
+      return "Unknown";
   }
 }

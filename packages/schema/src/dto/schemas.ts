@@ -6,10 +6,21 @@ import { formInteger } from "../utils/form-helpers.js";
 export const CreateTaskSchema = TaskBaseParametersSchema;
 
 // Update Task Schema
-export const UpdateTaskSchema = v.object({
-  ...TaskBaseParametersSchema.entries,
-  immediately: v.optional(v.boolean()),
-});
+export const UpdateTaskSchema = v.pipe(
+  v.object({
+    ...TaskBaseParametersSchema.entries,
+    immediately: v.optional(v.boolean()),
+  }),
+  v.check(
+    (params) =>
+      !(
+        params.category === null &&
+        params.country === null &&
+        params.query === null
+      ),
+    "at least one of country, category, or query must be provided",
+  ),
+);
 
 // List Tasks Query Schema
 export const ListTasksQuerySchema = v.object({

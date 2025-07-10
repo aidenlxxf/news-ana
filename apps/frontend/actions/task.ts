@@ -126,3 +126,35 @@ export async function updateTaskAction(
   }
   handleNextRedirect(formData);
 }
+
+// AI-specific Server Actions (without redirect logic)
+
+// AI Server Action for creating a new task
+export async function createTaskForAI(
+  taskData: v.InferInput<typeof CreateTaskSchema>,
+) {
+  const validatedData = v.parse(CreateTaskSchema, taskData);
+  const result = await createTask(validatedData);
+
+  // Revalidate the page to show the new task
+  revalidatePath("/");
+  revalidatePath(`/tasks/${result.taskId}`);
+
+  return result;
+}
+
+// AI Server Action for updating a task
+export async function updateTaskForAI(
+  taskId: string,
+  taskData: v.InferInput<typeof UpdateTaskSchema>,
+) {
+  const validatedData = v.parse(UpdateTaskSchema, taskData);
+  const result = await updateTask(taskId, validatedData);
+
+  // Revalidate the page to show the updated task
+  revalidatePath("/");
+  revalidatePath(`/tasks/${taskId}`);
+  revalidatePath(`/tasks/${taskId}/edit`);
+
+  return result;
+}
