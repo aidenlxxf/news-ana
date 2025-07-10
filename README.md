@@ -42,6 +42,7 @@ news-ana/
 
 - **框架**: Next.js 15.x (App Router)
 - **UI 组件**: Radix UI + shadcn/ui
+- **AI 集成**: Vercel AI SDK + AI SDK + OpenAI API
 - **样式**: Tailwind CSS 4.x
 - **状态管理**: Jotai (原子化状态管理)
 - **表单处理**: Valibot + Server Action，服务端校验
@@ -147,10 +148,10 @@ pnpm install --frozen-lockfile
 pnpm run turbo build
 ```
 
-1. 配置好以下的环境变量 [News Analysis](https://apd8i6ao7j.feishu.cn/docx/YojrdJbiuo3TtYxYNl4coveznBd#share-QJQvdK3UvoiZ5pxMHJkc1oLznNb)
+2. 配置好以下的环境变量 [News Analysis](https://apd8i6ao7j.feishu.cn/docx/YojrdJbiuo3TtYxYNl4coveznBd#share-QJQvdK3UvoiZ5pxMHJkc1oLznNb)
 
-   1. 需要前往 [https://newsapi.org/](https://newsapi.org/) 和 [https://platform.openai.com/](https://platform.openai.com/) 获取需要的 API Key
-2. 运行前后端
+   - 需要前往 [https://newsapi.org/](https://newsapi.org/) 和 [https://platform.openai.com/](https://platform.openai.com/) 获取需要的 API Key
+3. 运行前后端
 
 ```bash
 # 启动后端
@@ -159,12 +160,18 @@ pnpm --filter @mx/backend start
 pnpm --filter @mx/frontend start
 ```
 
-1. 如果需要 Web Push 支持，你需要启用 https，可根据需要使用 nginx 或 caddy 反向代理 http://localhost:3000 ，caddy 可基于以下配置，根据官方教程配置好 Let's Encrypt 和自己的域名来支持 https
+4. 如果需要 Web Push 支持，你需要启用 https，可根据需要使用 nginx 或 caddy 反向代理 http://localhost:3000 ，caddy 可基于以下配置，根据官方教程配置好 Let's Encrypt 和自己的域名来支持 https
 
 ```bash
 your-domain.com {
     reverse_proxy localhost:3000
 }
+```
+
+5. (可选) 如果需要添加测试账户 (test:password)，请运行
+
+```bash
+pnpm --filter @na/backend run db:seed
 ```
 
 ### 环境变量
